@@ -1,0 +1,17 @@
+# Virtual environment
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# Saved models (too large for git — regenerate with run_models.py)
+*.pkl
+
+# OS files
+.DS_Store
+Thumbs.db
