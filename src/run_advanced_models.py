@@ -52,8 +52,8 @@ train_df = pd.read_csv('data/KDDTrain+.txt', names=columns)
 test_df = pd.read_csv('data/KDDTest+.txt', names=columns)
 train_df = train_df.drop('difficulty_level', axis=1)
 test_df = test_df.drop('difficulty_level', axis=1)
-print(f"\n📊 Training set : {train_df.shape[0]:,} lignes")
-print(f"📊 Test set     : {test_df.shape[0]:,} lignes")
+print(f"\nTraining set : {train_df.shape[0]:,} lignes")
+print(f"Test set     : {test_df.shape[0]:,} lignes")
 
 # --- Preprocessing ---
 attack_mapping = {
@@ -96,7 +96,7 @@ X_test_scaled = pd.DataFrame(scaler.transform(X_test), columns=X_train.columns)
 
 joblib.dump(list(X_train.columns), 'models/model_columns.pkl')
 
-print(f"\n✅ Preprocessing terminé — Features shape: {X_train_scaled.shape}")
+print(f"\nPreprocessing terminé — Features shape: {X_train_scaled.shape}")
 
 print("INFO: Suppression des class_weights car SMOTE est utilisé dans le pipeline.")
 
@@ -105,7 +105,7 @@ cv_strategy = StratifiedKFold(n_splits=3, shuffle=True, random_state=42)
 
 # --- Random Forest ---
 print(f"\n{'='*70}")
-print("🌲 RANDOM FOREST - SMOTE PIPELINE")
+print("RANDOM FOREST - SMOTE PIPELINE")
 print(f"{'='*70}")
 
 rf_pipeline = ImbPipeline([
@@ -140,13 +140,13 @@ rf_y_pred = best_rf.predict(X_test_scaled)
 rf_pred_time = time.time() - start_time
 rf_y_proba = best_rf.predict_proba(X_test_scaled)
 
-print(f"\n⏱️  Temps total recherche RF : {rf_train_time:.2f}s | Prédiction : {rf_pred_time:.4f}s")
-print(f"🎯 F1 Macro (Test)  : {f1_score(y_test, rf_y_pred, average='macro'):.4f}")
+print(f"\nTemps total recherche RF : {rf_train_time:.2f}s | Prédiction : {rf_pred_time:.4f}s")
+print(f"F1 Macro (Test)  : {f1_score(y_test, rf_y_pred, average='macro'):.4f}")
 print(f"\n{classification_report(y_test, rf_y_pred, target_names=CLASS_LABELS, digits=4)}")
 
 # --- XGBoost ---
 print(f"\n{'='*70}")
-print("🚀 XGBOOST - SMOTE PIPELINE")
+print("XGBOOST - SMOTE PIPELINE")
 print(f"{'='*70}")
 
 xgb_pipeline = ImbPipeline([
@@ -185,13 +185,13 @@ xgb_y_pred = best_xgb.predict(X_test_scaled)
 xgb_pred_time = time.time() - start_time
 xgb_y_proba = best_xgb.predict_proba(X_test_scaled)
 
-print(f"\n⏱️  Temps total recherche XGB : {xgb_train_time:.2f}s | Prédiction : {xgb_pred_time:.4f}s")
-print(f"🎯 F1 Macro (Test)  : {f1_score(y_test, xgb_y_pred, average='macro'):.4f}")
+print(f"\nTemps total recherche XGB : {xgb_train_time:.2f}s | Prédiction : {xgb_pred_time:.4f}s")
+print(f"F1 Macro (Test)  : {f1_score(y_test, xgb_y_pred, average='macro'):.4f}")
 print(f"\n{classification_report(y_test, xgb_y_pred, target_names=CLASS_LABELS, digits=4)}")
 
 # --- Comparison ---
 print(f"\n{'='*70}")
-print("📊 COMPARAISON FINALE DES MODÈLES OPTIMISÉS (AVEC SMOTE)")
+print("COMPARAISON FINALE DES MODÈLES OPTIMISÉS (AVEC SMOTE)")
 print(f"{'='*70}")
 
 rf_precision, rf_recall, rf_f1, _ = precision_recall_fscore_support(y_test, rf_y_pred, average=None)
@@ -207,7 +207,7 @@ print(per_class.to_string(index=False, float_format='%.4f'))
 
 # --- Benchmarking ---
 print(f"\n{'='*70}")
-print("⏱️  BENCHMARK DE LATENCE (INSPIRATION MORPHEUS) - XGBoost")
+print("BENCHMARK DE LATENCE (INSPIRATION MORPHEUS) - XGBoost")
 print(f"{'='*70}")
 print("Évaluation de la capacité du modèle à tenir la charge d'un flux réseau temps réel.")
 
@@ -246,7 +246,7 @@ axes[1].set_ylabel('Vrai label'); axes[1].set_xlabel('Label prédit')
 
 plt.tight_layout()
 plt.savefig('reports/confusion_matrices_optimized.png', dpi=300, bbox_inches='tight')
-print("\n💾 confusion_matrices_optimized.png")
+print("\nconfusion_matrices_optimized.png")
 
 # Comparison bar chart
 fig, axes = plt.subplots(1, 3, figsize=(20, 6))
@@ -266,7 +266,7 @@ for ax, metric_rf, metric_xgb, title in [
 plt.suptitle('Comparaison Random Forest vs XGBoost (SMOTE + CV)', fontsize=16, fontweight='bold', y=1.02)
 plt.tight_layout()
 plt.savefig('reports/model_comparison_optimized.png', dpi=300, bbox_inches='tight')
-print("💾 model_comparison_optimized.png")
+print("model_comparison_optimized.png")
 
 # ROC curves
 y_test_bin = label_binarize(y_test, classes=[0, 1, 2, 3, 4])
@@ -284,7 +284,7 @@ for ax, y_proba, title in [(axes[0], rf_y_proba, 'SMOTE Random Forest'), (axes[1
 
 plt.tight_layout()
 plt.savefig('reports/roc_curves_optimized.png', dpi=300, bbox_inches='tight')
-print("💾 roc_curves_optimized.png")
+print("roc_curves_optimized.png")
 
 # Feature importance
 fig, axes = plt.subplots(1, 2, figsize=(20, 8))
@@ -302,7 +302,7 @@ xgb_imp.sort_values().plot(kind='barh', ax=axes[1], color='#e74c3c', alpha=0.85)
 axes[1].set_title('SMOTE XGBoost — Top 20 Features', fontsize=14, fontweight='bold')
 plt.tight_layout()
 plt.savefig('reports/feature_importance_optimized.png', dpi=300, bbox_inches='tight')
-print("💾 feature_importance_optimized.png")
+print("feature_importance_optimized.png")
 
 # --- Save models ---
 joblib.dump(best_rf, 'rf_model_cv.pkl')
@@ -314,9 +314,9 @@ xgb_f1_macro = f1_score(y_test, xgb_y_pred, average='macro')
 
 if xgb_f1_macro > rf_f1_macro:
     joblib.dump(best_xgb, 'best_model_cv.pkl')
-    print(f"\n🏆 Meilleur modèle final : XGBoost (F1 Macro: {xgb_f1_macro:.4f})")
+    print(f"\nMeilleur modèle final : XGBoost (F1 Macro: {xgb_f1_macro:.4f})")
 else:
     joblib.dump(best_rf, 'best_model_cv.pkl')
-    print(f"\n🏆 Meilleur modèle final : Random Forest (F1 Macro: {rf_f1_macro:.4f})")
+    print(f"\nMeilleur modèle final : Random Forest (F1 Macro: {rf_f1_macro:.4f})")
 
-print("\n✅ Terminé ! Modèles optimisés sauvegardés (rf_model_cv.pkl, xgb_model_cv.pkl, best_model_cv.pkl)")
+print("\nTerminé ! Modèles optimisés sauvegardés (rf_model_cv.pkl, xgb_model_cv.pkl, best_model_cv.pkl)")
