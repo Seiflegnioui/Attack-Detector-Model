@@ -23,6 +23,32 @@ Pour y parvenir, ce projet est construit sur trois piliers :
 
 Le dataset [NSL-KDD](https://www.kaggle.com/datasets/hassan06/nslkdd) est un benchmark public de référence pour la cybersécurité. Le jeu de test contient de nombreux types d'attaques qui n'existent pas dans le jeu d'entraînement, ce qui représente un défi de généralisation énorme.
 
+📁 Le projet suit l'architecture standard MLOps (Cookiecutter Data Science) :
+```text
+Attack-Detector-Model/
+├── api/
+│   └── api.py                  # Backend FastAPI
+├── data/
+│   └── KDD*.txt, KDD*.arff     # Datasets bruts NSL-KDD
+├── frontend/
+│   └── index.html              # Dashboard UI
+├── models/
+│   └── *.pkl                   # Modèles entraînés, scalers, colonnes
+├── notebooks/
+│   ├── model_training.ipynb    # Recherche & expérimentation
+│   └── preparedata.ipynb       # Préparation des données
+├── reports/
+│   └── *.png                   # Graphiques de performance
+├── src/
+│   ├── run_advanced_models.py  # Code d'entraînement optimisé (XGBoost + SMOTE)
+│   └── run_models.py           # Ancienne version (Random Forest)
+├── Dockerfile                  # Configuration de l'image de l'API
+├── docker-compose.yml          # Orchestration des microservices
+├── requirements.txt            # Dépendances Python
+└── README.md
+```
+
+
 | Classe | Description | Train Samples | Déséquilibre |
 |--------|-------------|:-------------:|:------------:|
 | **Normal** | Trafic légitime | 67,343 (53.5%) | Majoritaire |
@@ -105,12 +131,12 @@ pip install -r requirements.txt
 2. **Démarrer le backend (FastAPI)**
 L'API charge le modèle et simule le flux réseau.
 ```bash
-uvicorn api:app --reload
+uvicorn api.api:app --reload
 ```
 - 📘 Testez l'API manuellement sur **http://127.0.0.1:8000/docs** (Interface Swagger).
 
 3. **Ouvrir le Dashboard**
-Double-cliquez simplement sur le fichier **`index.html`** dans votre navigateur web et cliquez sur "Démarrer la Simulation" !
+Double-cliquez simplement sur le fichier **`frontend/index.html`** dans votre navigateur web et cliquez sur "Démarrer la Simulation" !
 
 ---
 

@@ -13,13 +13,13 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copie des fichiers vitaux pour l'API (Code, Modèles, Scaler)
-COPY api.py .
-COPY best_model_cv.pkl .
-COPY scaler.pkl .
+COPY api/api.py .
+COPY models/best_model_cv.pkl models/
+COPY models/scaler.pkl models/
 
 # Copie des datasets nécessaires au preprocessing initial au démarrage de l'API
-COPY model_columns.pkl .
-COPY KDDTest+.txt .
+COPY models/model_columns.pkl models/
+COPY data/KDDTest+.txt data/
 
 
 # Exposition du port sur lequel l'API va écouter

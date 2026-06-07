@@ -77,9 +77,9 @@ def load_data():
     global model, scaler, model_columns, X_test_scaled_arr, raw_test_info
     print("🚀 Chargement Ultra-Rapide (Mémoire Optimisée)...")
     
-    model = joblib.load('best_model_cv.pkl')
-    scaler = joblib.load('scaler.pkl')
-    model_columns = joblib.load('model_columns.pkl')
+    model = joblib.load('models/best_model_cv.pkl')
+    scaler = joblib.load('models/scaler.pkl')
+    model_columns = joblib.load('models/model_columns.pkl')
     
     columns = [
         'duration', 'protocol_type', 'service', 'flag', 'src_bytes', 'dst_bytes',
@@ -93,7 +93,7 @@ def load_data():
         'dst_host_srv_diff_host_rate', 'dst_host_serror_rate', 'dst_host_srv_serror_rate',
         'dst_host_rerror_rate', 'dst_host_srv_rerror_rate', 'label', 'difficulty_level'
     ]
-    test_df = pd.read_csv('KDDTest+.txt', names=columns)
+    test_df = pd.read_csv('data/KDDTest+.txt', names=columns)
     
     attack_mapping = {
         'neptune': 'DoS', 'smurf': 'DoS', 'back': 'DoS', 'teardrop': 'DoS', 'pod': 'DoS', 'land': 'DoS',
