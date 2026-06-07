@@ -208,11 +208,6 @@
                 </div>
             </div>
 
-            <div class="panel-title" style="margin-top: 2rem;">Visualisations</div>
-            <div class="charts">
-                <img src="confusion_matrices_optimized.png" alt="Confusion Matrix">
-                <img src="feature_importance_optimized.png" alt="Feature Importance">
-            </div>
         </div>
 
         <!-- Right Panel: Live Feed -->
@@ -228,6 +223,19 @@
 
             <div class="feed-container" id="feed-container">
                 <!-- Rows injected by JS -->
+            </div>
+        </div>
+
+        <!-- Bottom Panel: Visualisations (Full Width) -->
+        <div class="glass-panel" style="grid-column: 1 / -1;">
+            <div class="panel-title">Visualisations (Comparaison Random Forest vs XGBoost)</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                <div class="charts">
+                    <img src="confusion_matrices_optimized.png" alt="Confusion Matrix">
+                </div>
+                <div class="charts">
+                    <img src="feature_importance_optimized.png" alt="Feature Importance">
+                </div>
             </div>
         </div>
     </div>
