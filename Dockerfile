@@ -18,8 +18,9 @@ COPY best_model_cv.pkl .
 COPY scaler.pkl .
 
 # Copie des datasets nécessaires au preprocessing initial au démarrage de l'API
-COPY KDDTrain+.txt .
+COPY model_columns.pkl .
 COPY KDDTest+.txt .
+
 
 # Exposition du port sur lequel l'API va écouter
 EXPOSE 8000

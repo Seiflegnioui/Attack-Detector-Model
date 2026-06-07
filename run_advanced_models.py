@@ -94,7 +94,10 @@ scaler = StandardScaler()
 X_train_scaled = pd.DataFrame(scaler.fit_transform(X_train), columns=X_train.columns)
 X_test_scaled = pd.DataFrame(scaler.transform(X_test), columns=X_train.columns)
 
+joblib.dump(list(X_train.columns), 'model_columns.pkl')
+
 print(f"\n✅ Preprocessing terminé — Features shape: {X_train_scaled.shape}")
+
 print("INFO: Suppression des class_weights car SMOTE est utilisé dans le pipeline.")
 
 # Stratified K-Fold setup

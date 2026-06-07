@@ -12,6 +12,8 @@ __pycache__/
 *.pkl
 !best_model_cv.pkl
 !scaler.pkl
+!model_columns.pkl
+
 
 # Les graphiques (servis par le Nginx directement depuis le dossier hôte)
 *.png
