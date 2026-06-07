@@ -19,11 +19,11 @@ services:
       - "8080:80"
     volumes:
       # Montage des fichiers statiques dans le conteneur
-      - ./index.html:/usr/share/nginx/html/index.html:ro
-      - ./confusion_matrices_optimized.png:/usr/share/nginx/html/confusion_matrices_optimized.png:ro
-      - ./feature_importance_optimized.png:/usr/share/nginx/html/feature_importance_optimized.png:ro
-      - ./model_comparison_optimized.png:/usr/share/nginx/html/model_comparison_optimized.png:ro
-      - ./roc_curves_optimized.png:/usr/share/nginx/html/roc_curves_optimized.png:ro
+      - ./frontend/index.html:/usr/share/nginx/html/index.html:ro
+      - ./reports/confusion_matrices_optimized.png:/usr/share/nginx/html/confusion_matrices_optimized.png:ro
+      - ./reports/feature_importance_optimized.png:/usr/share/nginx/html/feature_importance_optimized.png:ro
+      - ./reports/model_comparison_optimized.png:/usr/share/nginx/html/model_comparison_optimized.png:ro
+      - ./reports/roc_curves_optimized.png:/usr/share/nginx/html/roc_curves_optimized.png:ro
     depends_on:
       - api
     restart: unless-stopped

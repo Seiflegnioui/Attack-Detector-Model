@@ -48,8 +48,8 @@ columns = [
     'dst_host_rerror_rate', 'dst_host_srv_rerror_rate', 'label', 'difficulty_level'
 ]
 
-train_df = pd.read_csv('KDDTrain+.txt', names=columns)
-test_df = pd.read_csv('KDDTest+.txt', names=columns)
+train_df = pd.read_csv('data/KDDTrain+.txt', names=columns)
+test_df = pd.read_csv('data/KDDTest+.txt', names=columns)
 train_df = train_df.drop('difficulty_level', axis=1)
 test_df = test_df.drop('difficulty_level', axis=1)
 print(f"\n📊 Training set : {train_df.shape[0]:,} lignes")
@@ -94,7 +94,7 @@ scaler = StandardScaler()
 X_train_scaled = pd.DataFrame(scaler.fit_transform(X_train), columns=X_train.columns)
 X_test_scaled = pd.DataFrame(scaler.transform(X_test), columns=X_train.columns)
 
-joblib.dump(list(X_train.columns), 'model_columns.pkl')
+joblib.dump(list(X_train.columns), 'models/model_columns.pkl')
 
 print(f"\n✅ Preprocessing terminé — Features shape: {X_train_scaled.shape}")
 
@@ -245,7 +245,7 @@ axes[1].set_title('SMOTE XGBoost — Confusion Matrix', fontsize=14, fontweight=
 axes[1].set_ylabel('Vrai label'); axes[1].set_xlabel('Label prédit')
 
 plt.tight_layout()
-plt.savefig('confusion_matrices_optimized.png', dpi=150, bbox_inches='tight')
+plt.savefig('reports/confusion_matrices_optimized.png', dpi=300, bbox_inches='tight')
 print("\n💾 confusion_matrices_optimized.png")
 
 # Comparison bar chart
@@ -265,7 +265,7 @@ for ax, metric_rf, metric_xgb, title in [
 
 plt.suptitle('Comparaison Random Forest vs XGBoost (SMOTE + CV)', fontsize=16, fontweight='bold', y=1.02)
 plt.tight_layout()
-plt.savefig('model_comparison_optimized.png', dpi=150, bbox_inches='tight')
+plt.savefig('reports/model_comparison_optimized.png', dpi=300, bbox_inches='tight')
 print("💾 model_comparison_optimized.png")
 
 # ROC curves
@@ -283,7 +283,7 @@ for ax, y_proba, title in [(axes[0], rf_y_proba, 'SMOTE Random Forest'), (axes[1
     ax.legend(loc='lower right'); ax.grid(alpha=0.3)
 
 plt.tight_layout()
-plt.savefig('roc_curves_optimized.png', dpi=150, bbox_inches='tight')
+plt.savefig('reports/roc_curves_optimized.png', dpi=300, bbox_inches='tight')
 print("💾 roc_curves_optimized.png")
 
 # Feature importance
@@ -301,13 +301,13 @@ axes[0].set_title('SMOTE Random Forest — Top 20 Features', fontsize=14, fontwe
 xgb_imp.sort_values().plot(kind='barh', ax=axes[1], color='#e74c3c', alpha=0.85)
 axes[1].set_title('SMOTE XGBoost — Top 20 Features', fontsize=14, fontweight='bold')
 plt.tight_layout()
-plt.savefig('feature_importance_optimized.png', dpi=150, bbox_inches='tight')
+plt.savefig('reports/feature_importance_optimized.png', dpi=300, bbox_inches='tight')
 print("💾 feature_importance_optimized.png")
 
 # --- Save models ---
 joblib.dump(best_rf, 'rf_model_cv.pkl')
-joblib.dump(best_xgb, 'xgb_model_cv.pkl')
-joblib.dump(scaler, 'scaler.pkl')
+joblib.dump(best_xgb, 'models/best_model_cv.pkl')
+joblib.dump(scaler, 'models/scaler.pkl')
 
 rf_f1_macro = f1_score(y_test, rf_y_pred, average='macro')
 xgb_f1_macro = f1_score(y_test, xgb_y_pred, average='macro')
