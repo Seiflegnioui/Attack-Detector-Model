@@ -305,18 +305,18 @@ plt.savefig('reports/feature_importance_optimized.png', dpi=300, bbox_inches='ti
 print("feature_importance_optimized.png")
 
 # --- Save models ---
-joblib.dump(best_rf, 'rf_model_cv.pkl')
-joblib.dump(best_xgb, 'models/best_model_cv.pkl')
+joblib.dump(best_rf, 'models/rf_model_cv.pkl')
+joblib.dump(best_xgb, 'models/xgb_model_cv.pkl')
 joblib.dump(scaler, 'models/scaler.pkl')
 
 rf_f1_macro = f1_score(y_test, rf_y_pred, average='macro')
 xgb_f1_macro = f1_score(y_test, xgb_y_pred, average='macro')
 
 if xgb_f1_macro > rf_f1_macro:
-    joblib.dump(best_xgb, 'best_model_cv.pkl')
+    joblib.dump(best_xgb, 'models/best_model_cv.pkl')
     print(f"\nMeilleur modèle final : XGBoost (F1 Macro: {xgb_f1_macro:.4f})")
 else:
-    joblib.dump(best_rf, 'best_model_cv.pkl')
+    joblib.dump(best_rf, 'models/best_model_cv.pkl')
     print(f"\nMeilleur modèle final : Random Forest (F1 Macro: {rf_f1_macro:.4f})")
 
-print("\nTerminé ! Modèles optimisés sauvegardés (rf_model_cv.pkl, xgb_model_cv.pkl, best_model_cv.pkl)")
+print("\nTerminé ! Modèles optimisés sauvegardés (models/rf_model_cv.pkl, models/xgb_model_cv.pkl, models/best_model_cv.pkl)")
