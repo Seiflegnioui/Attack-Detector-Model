@@ -1,487 +1,345 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml">
+<!DOCTYPE html>
+<html lang="fr">
 <head>
-    <meta http-equiv="Content-Language" content="en-us" />
-    <meta name="GENERATOR" content="Microsoft FrontPage 6.0" />
-    <meta name="ProgId" content="FrontPage.Editor.Document" />
-    <meta http-equiv="Content-Type" content="text/html; charset=windows-1252" />
-    <meta name="keywords" content="NSL-KDD" />
-    <title>The NSL-KDD Data Set</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NSL-KDD | Real-Time IDS Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0a0e17;
+            --glass-bg: rgba(20, 25, 35, 0.6);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --accent-green: #00ff88;
+            --accent-red: #ff3366;
+            --accent-blue: #00e5ff;
+            --text-main: #e2e8f0;
+            --text-dim: #94a3b8;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 15% 50%, rgba(0, 229, 255, 0.05), transparent 25%),
+                radial-gradient(circle at 85% 30%, rgba(255, 51, 102, 0.05), transparent 25%);
+            color: var(--text-main);
+            min-height: 100vh;
+            padding: 2rem;
+            overflow-x: hidden;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 1rem;
+        }
+
+        h1 {
+            font-weight: 800;
+            font-size: 2rem;
+            background: linear-gradient(90deg, var(--accent-blue), #b388ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subtitle { font-size: 0.9rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 2px;}
+
+        .api-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+            background: var(--glass-bg);
+            padding: 8px 16px;
+            border-radius: 20px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .pulse {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background-color: var(--accent-red); /* Red by default until connected */
+            box-shadow: 0 0 10px var(--accent-red);
+        }
+        .pulse.active { background-color: var(--accent-green); box-shadow: 0 0 10px var(--accent-green); animation: pulsing 2s infinite; }
+
+        @keyframes pulsing {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 136, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(0, 255, 136, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 255, 136, 0); }
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 2rem;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .panel-title {
+            font-size: 1.2rem; font-weight: 600;
+            margin-bottom: 1.5rem; color: #fff;
+            display: flex; justify-content: space-between;
+        }
+
+        /* Metrics */
+        .metrics-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .metric-card {
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px; padding: 1rem; text-align: center;
+        }
+        .metric-val { font-size: 2rem; font-weight: 800; margin: 0.5rem 0; color: var(--accent-blue); }
+        .metric-lbl { font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase;}
+
+        .charts img {
+            width: 100%; border-radius: 8px; margin-bottom: 1rem;
+            border: 1px solid var(--glass-border);
+            transition: transform 0.3s ease;
+        }
+        .charts img:hover { transform: scale(1.02); }
+
+        /* Live Feed */
+        .controls { margin-bottom: 1rem; display: flex; gap: 1rem; }
+        button {
+            background: linear-gradient(45deg, #1e293b, #0f172a);
+            color: #fff; border: 1px solid var(--glass-border);
+            padding: 8px 16px; border-radius: 8px; cursor: pointer;
+            font-family: 'JetBrains Mono', monospace; font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        button:hover { border-color: var(--accent-blue); box-shadow: 0 0 15px rgba(0, 229, 255, 0.2); }
+        button.running { border-color: var(--accent-green); box-shadow: 0 0 15px rgba(0, 255, 136, 0.2); }
+
+        .feed-container {
+            display: flex; flex-direction: column; gap: 0.8rem;
+            height: 600px; overflow-y: auto;
+            padding-right: 10px;
+        }
+        
+        .feed-container::-webkit-scrollbar { width: 6px; }
+        .feed-container::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 4px; }
+
+        .connection-row {
+            display: grid; grid-template-columns: 1fr 3fr 1.5fr 1fr;
+            align-items: center;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--glass-border);
+            border-left: 4px solid var(--glass-border);
+            padding: 1rem; border-radius: 8px;
+            animation: slideIn 0.3s ease forwards;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85rem;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .conn-normal { border-left-color: var(--accent-green); }
+        .conn-attack { border-left-color: var(--accent-red); background: rgba(255, 51, 102, 0.05); }
+
+        .badge {
+            padding: 4px 8px; border-radius: 4px; font-weight: 600; text-align: center;
+        }
+        .bg-normal { background: rgba(0, 255, 136, 0.1); color: var(--accent-green); }
+        .bg-attack { background: rgba(255, 51, 102, 0.1); color: var(--accent-red); }
+
+        .conn-details { color: var(--text-dim); }
+        .conn-details span { color: #fff; }
+        
+        .latency { text-align: right; color: var(--text-dim); }
+
+    </style>
 </head>
-<body style="margin-left: 0; margin-right: 0; margin-top: 0; margin-bottom: 0; background-color: White;">
-    <div>
-        <center>
-            <table style="border-collapse: collapse; border-color: #111111; width: 1000px;" id="AutoNumber1"
-                border="0" cellpadding="0" cellspacing="0">
-                <tbody>
-                    <tr style="height: 30px;">
-                    </tr>
-                    <tr>
-                        <td colspan="2" style="width: 100%; height: 100%; vertical-align: middle; text-align: center;">
-                            <label style="font-family: Times New Roman; font-weight: bolder; font-size: xx-large;">
-                                The NSL-KDD Data Set</label>
-                        </td>
-                    </tr>
-                    <tr style="height: 30px;">
-                    </tr>
-                    <tr>
-                        <td colspan="2" style="width: 100%; height: 100%; vertical-align: middle; text-align: left;">
-                            <label style="font-family: Times New Roman; font-weight: bolder; font-size: x-large;">
-                                Abstract</label>
-                        </td>
-                    </tr>
-                    <tr style="height: 20px;">
-                    </tr>
-                    <tr>
-                        <td colspan="2" style="width: 100%; text-align: justify;">
-                            <label style="font-family: Times New Roman; font-size: large;">
-                                NSL-KDD is a data set suggested to solve some of the inherent problems of the KDD'99
-                                data set which are mentioned in [1]. Although, this new version of the KDD data
-                                set still suffers from some of the problems discussed by McHugh [2] and may not
-                                be a perfect representative of existing real networks, because of the lack of public
-                                data sets for network-based IDSs, we believe it still can be applied as an effective
-                                benchmark data set to help researchers compare different intrusion detection methods.
-                                Furthermore, the number of records in the NSL-KDD train and test sets are reasonable.
-                                This advantage makes it affordable to run the experiments on the complete set without
-                                the need to randomly select a small portion. Consequently, evaluation results of
-                                different research work will be consistent and comparable.
-                                <br />
-                                <br />
-                            </label>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2" style="width: 100%; height: 100%; vertical-align: middle; text-align: left;">
-                            <label style="font-family: Times New Roman; font-weight: bolder; font-size: x-large;">
-                                Data Files</label>
-                        </td>
-                        <tr>
-                        </tr>
-                        <tr style="height: 20px;">
-                        </tr>
-                        <tr>
-                            <td style="width: 26%; text-align: left;">
-                                <a href="http://nsl.cs.unb.ca/NSL-KDD/KDDTrain+.arff" target="_blank" style="text-decoration: none;
-                                    font-family: Times New Roman; font-weight: bolder; font-size: large;">KDDTrain+.ARFF</a>
-                            </td>
-                            <td style="text-align: left;">
-                                <label style="font-family: Times New Roman; font-size: large;">
-                                    The full NSL-KDD train set with binary labels in ARFF format</label>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="width: 26%; text-align: left;">
-                                <a href="http://nsl.cs.unb.ca/NSL-KDD/KDDTrain+.txt" target="_blank" style="text-decoration: none;
-                                    font-family: Times New Roman; font-weight: bolder; font-size: large;">KDDTrain+.TXT</a>
-                            </td>
-                            <td style="text-align: left;">
-                                <label style="font-family: Times New Roman; font-size: large;">
-                                    The full NSL-KDD train set including attack-type labels and difficulty level in
-                                    CSV format</label>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="width: 26%; text-align: left;">
-                                <a href="http://nsl.cs.unb.ca/NSL-KDD/KDDTrain+_20Percent.arff" target="_blank" style="text-decoration: none;
-                                    font-family: Times New Roman; font-weight: bolder; font-size: large;">KDDTrain+_20Percent.ARFF</a>
-                            </td>
-                            <td style="text-align: left;">
-                                <label style="font-family: Times New Roman; font-size: large;">
-                                    A 20% subset of the KDDTrain+.arff file</label>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="width: 26%; text-align: left;">
-                                <a href="http://nsl.cs.unb.ca/NSL-KDD/KDDTrain+_20Percent.txt" target="_blank" style="text-decoration: none;
-                                    font-family: Times New Roman; font-weight: bolder; font-size: large;">KDDTrain+_20Percent.TXT</a>
-                            </td>
-                            <td style="text-align: left;">
-                                <label style="font-family: Times New Roman; font-size: large;">
-                                    A 20% subset of the KDDTrain+.txt file</label>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="width: 26%; text-align: left;">
-                                <a href="http://nsl.cs.unb.ca/NSL-KDD/KDDTest+.arff" target="_blank" style="text-decoration: none;
-                                    font-family: Times New Roman; font-weight: bolder; font-size: large;">KDDTest+.ARFF</a>
-                            </td>
-                            <td style="text-align: left;">
-                                <label style="font-family: Times New Roman; font-size: large;">
-                                    The full NSL-KDD test set with binary labels in ARFF format</label>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="width: 26%; text-align: left;">
-                                <a href="http://nsl.cs.unb.ca/NSL-KDD/KDDTest+.txt" target="_blank" style="text-decoration: none;
-                                    font-family: Times New Roman; font-weight: bolder; font-size: large;">KDDTest+.TXT</a>
-                            </td>
-                            <td style="text-align: left;">
-                                <label style="font-family: Times New Roman; font-size: large;">
-                                    The full NSL-KDD test set including attack-type labels and difficulty level in CSV
-                                    format</label>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="width: 26%; text-align: left;">
-                                <a href="http://nsl.cs.unb.ca/NSL-KDD/KDDTest-21.arff" target="_blank" style="text-decoration: none;
-                                    font-family: Times New Roman; font-weight: bolder; font-size: large;">KDDTest-21.ARFF</a>
-                            </td>
-                            <td style="text-align: left;">
-                                <label style="font-family: Times New Roman; font-size: large;">
-                                    A subset of the KDDTest+.arff file which does not include records with difficulty
-                                    level of 21 out of 21</label>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td style="width: 26%; text-align: left;">
-                                <a href="http://nsl.cs.unb.ca/NSL-KDD/KDDTest-21.txt" target="_blank" style="text-decoration: none;
-                                    font-family: Times New Roman; font-weight: bolder; font-size: large;">KDDTest-21.TXT</a>
-                            </td>
-                            <td style="text-align: left;">
-                                <label style="font-family: Times New Roman; font-size: large;">
-                                    A subset of the KDDTest+.txt file which does not include records with difficulty
-                                    level of 21 out of 21</label>
-                            </td>
-                        </tr>
-                        <td colspan="2">
-                            <label>
-                                <br />
-                                <br />
-                            </label>
-                        </td>
-                        <tr>
-                            <td colspan="2" style="width: 100%; height: 100%; vertical-align: middle; text-align: left;">
-                                <label style="font-family: Times New Roman; font-weight: bolder; font-size: x-large;">
-                                    Improvements to the KDD'99 data set</label>
-                            </td>
-                        </tr>
-                        <tr style="height: 20px;">
-                        </tr>
-                        <tr>
-                            <td colspan="2" style="width: 100%; text-align: justify;">
-                                <label style="font-family: Times New Roman; font-size: large;">
-                                    The NSL-KDD data set has the following advantages over the original KDD data set:
-                                </label>
-                                <ul style="font-family: Times New Roman; font-size: large;">
-                                    <li style="list-style-type: square">It does not include redundant records in the train
-                                        set, so the classifiers will not be biased towards more frequent records.</li><br />
-                                    <li style="list-style-type: square">There is no duplicate records in the proposed test
-                                        sets; therefore, the performance of the learners are not biased by the methods which
-                                        have better detection rates on the frequent records.</li><br />
-                                    <li style="list-style-type: square">The number of selected records from each difficultylevel
-                                        group is inversely proportional to the percentage of records in the original KDD
-                                        data set. As a result, the classification rates of distinct machine learning methods
-                                        vary in a wider range, which makes it more efficient to have an accurate evaluation
-                                        of different learning techniques.</li><br />
-                                    <li style="list-style-type: square">The number of records in the train and test sets
-                                        are reasonable, which makes it affordable to run the experiments on the complete
-                                        set without the need to randomly select a small portion. Consequently, evaluation
-                                        results of different research works will be consistent and comparable.</li><br />
-                                </ul>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="2" style="width: 100%; height: 100%; vertical-align: middle; text-align: left;">
-                                <label style="font-family: Times New Roman; font-weight: bolder; font-size: x-large;">
-                                    Statistical Observations</label>
-                            </td>
-                        </tr>
-                        <tr style="height: 20px;">
-                        </tr>
-                        <tr>
-                            <td colspan="2" style="width: 100%; text-align: justify;">
-                                <label style="font-family: Times New Roman; font-size: large;">
-                                    One of the most important deficiencies in the KDD data set is the huge number of
-                                    redundant records, which causes the learning algorithms to be biased towards the
-                                    frequent records, and thus prevent them from learning unfrequent records which are
-                                    usually more harmful to networks such as U2R and R2L attacks. In addition, the existence
-                                    of these repeated records in the test set will cause the evaluation results to be
-                                    biased by the methods which have better detection rates on the frequent records.
-                                </label>
-                            </td>
-                        </tr>
-                    </tr>
-                </tbody>
-            </table>
-            <table style="border-collapse: collapse; border-color: #111111; width: 1000px;" id="Table2"
-                border="0" cellpadding="0" cellspacing="0">
-                <tbody>
-                    <tr style="height: 20px;">
-                    </tr>
-                    <tr>
-                        <td style="width: 30px;">
-                        </td>
-                        <td style="width: 470px;">
-                            <table style="border-collapse: collapse; border-color: #111111;" id="Table3" border="1"
-                                cellpadding="1" cellspacing="0">
-                                <tbody>
-                                    <tr>
-                                        <td style="width: 80px; text-align: center;">
-                                            <label style="font-family: Times New Roman; font-size: medium; font-weight: bolder;">
-                                            </label>
-                                        </td>
-                                        <td style="width: 120px; text-align: center;">
-                                            <label style="font-family: Times New Roman; font-size: medium; font-weight: bolder;">
-                                                Original Records</label>
-                                        </td>
-                                        <td style="width: 120px; text-align: center;">
-                                            <label style="font-family: Times New Roman; font-size: medium; font-weight: bolder;">
-                                                Distinct Records</label>
-                                        </td>
-                                        <td style="width: 110px; text-align: center;">
-                                            <label style="font-family: Times New Roman; font-size: medium; font-weight: bolder;">
-                                                Reduction Rate</label>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td style="width: 80px; text-align: center;">
-                                            <label style="font-family: Times New Roman; font-size: medium; font-weight: bolder;">
-                                                Attacks</label>
-                                        </td>
-                                        <td style="width: 120px; text-align: center;">
-                                            <label style="font-family: Times New Roman; font-size: medium;">
-                                                3,925,650</label>
-                                        </td>
-                                        <td style="width: 120px; text-align: center;">
-                                            <label style="font-family: Times New Roman; font-size: medium;">
-                                                262,178</label>
-                                        </td>
-                                        <td style="width: 110px; text-align: center;">
-                                            <label style="font-family: Times New Roman; font-size: medium;">
-                                                93.32%</label>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td style="width: 80px; text-align: center;">
-                                            <label style="font-family: Times New Roman; font-size: medium; font-weight: bolder;">
-                                                Normal</label>
-                                        </td>
-                                        <td style="width: 120px; text-align: center;">
-                                            <label style="font-family: Times New Roman; font-size: medium;">
-                                                972,781</label>
-                                        </td>
-                                        <td style="width: 120px; text-align: center;">
-                                            <label style="font-family: Times New Roman; font-size: medium;">
-                                                812,814</label>
-                                        </td>
-                                        <td style="width: 110px; text-align: center;">
-                                            <label style="font-family: Times New Roman; font-size: medium;">
-                                                16.44%</label>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td style="width: 80px; text-align: center;">
-                                            <label style="font-family: Times New Roman; font-size: medium; font-weight: bolder;">
-                                                Total</label>
-                                        </td>
-                                        <td style="width: 120px; text-align: center;">
-                                            <label style="font-family: Times New Roman; font-size: medium;">
-                                                4,898,431</label>
-                                        </td>
-                                        <td style="width: 120px; text-align: center;">
-                                            <label style="font-family: Times New Roman; font-size: medium;">
-                                                1,074,992</label>
-                                        </td>
-                                        <td style="width: 110px; text-align: center;">
-                                            <label style="font-family: Times New Roman; font-size: medium;">
-                                                78.05%</label>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </td>
-                        <td style="width: 30px;">
-                        </td>
-                        <td style="width: 470px; text-align: justify;">
-                            <table style="border-collapse: collapse; border-color: #111111;" id="Table1" border="1"
-                                cellpadding="1" cellspacing="0">
-                                <tbody>
-                                    <tr>
-                                        <td style="width: 80px; text-align: center;">
-                                            <label style="font-family: Times New Roman; font-size: medium; font-weight: bolder;">
-                                            </label>
-                                        </td>
-                                        <td style="width: 120px; text-align: center;">
-                                            <label style="font-family: Times New Roman; font-size: medium; font-weight: bolder;">
-                                                Original Records</label>
-                                        </td>
-                                        <td style="width: 120px; text-align: center;">
-                                            <label style="font-family: Times New Roman; font-size: medium; font-weight: bolder;">
-                                                Distinct Records</label>
-                                        </td>
-                                        <td style="width: 110px; text-align: center;">
-                                            <label style="font-family: Times New Roman; font-size: medium; font-weight: bolder;">
-                                                Reduction Rate</label>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td style="width: 80px; text-align: center;">
-                                            <label style="font-family: Times New Roman; font-size: medium; font-weight: bolder;">
-                                                Attacks</label>
-                                        </td>
-                                        <td style="width: 120px; text-align: center;">
-                                            <label style="font-family: Times New Roman; font-size: medium;">
-                                                250,436</label>
-                                        </td>
-                                        <td style="width: 120px; text-align: center;">
-                                            <label style="font-family: Times New Roman; font-size: medium;">
-                                                29,378</label>
-                                        </td>
-                                        <td style="width: 110px; text-align: center;">
-                                            <label style="font-family: Times New Roman; font-size: medium;">
-                                                88.26%</label>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td style="width: 80px; text-align: center;">
-                                            <label style="font-family: Times New Roman; font-size: medium; font-weight: bolder;">
-                                                Normal</label>
-                                        </td>
-                                        <td style="width: 120px; text-align: center;">
-                                            <label style="font-family: Times New Roman; font-size: medium;">
-                                                60,591</label>
-                                        </td>
-                                        <td style="width: 120px; text-align: center;">
-                                            <label style="font-family: Times New Roman; font-size: medium;">
-                                                47,911</label>
-                                        </td>
-                                        <td style="width: 110px; text-align: center;">
-                                            <label style="font-family: Times New Roman; font-size: medium;">
-                                                20.92%</label>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td style="width: 80px; text-align: center;">
-                                            <label style="font-family: Times New Roman; font-size: medium; font-weight: bolder;">
-                                                Total</label>
-                                        </td>
-                                        <td style="width: 120px; text-align: center;">
-                                            <label style="font-family: Times New Roman; font-size: medium;">
-                                                311,027</label>
-                                        </td>
-                                        <td style="width: 120px; text-align: center;">
-                                            <label style="font-family: Times New Roman; font-size: medium;">
-                                                77,289</label>
-                                        </td>
-                                        <td style="width: 110px; text-align: center;">
-                                            <label style="font-family: Times New Roman; font-size: medium;">
-                                                75.15%</label>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </td>
-                    </tr>
-                    <tr style="height: 40px;">
-                        <td style="width: 30px;">
-                        </td>
-                        <td style="width: 470px; text-align: center;">
-                            <label style="font-family: Times New Roman; font-size: medium; font-weight: bolder;">
-                                Statistics of redundant records in the KDD train set</label>
-                        </td>
-                        <td style="width: 30px;">
-                        </td>
-                        <td style="width: 470px; text-align: center;">
-                            <label style="font-family: Times New Roman; font-size: medium; font-weight: bolder;">
-                                Statistics of redundant records in the KDD test set</label>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <table style="border-collapse: collapse; border-color: #111111; width: 1000px;" id="Table4"
-                border="0" cellpadding="0" cellspacing="0">
-                <tbody>
-                    <tr style="height: 30px;">
-                    </tr>
-                    <tr>
-                        <td colspan="4" style="width: 100%; text-align: justify;">
-                            <label style="font-family: Times New Roman; font-size: large;">
-                                In addition, we analyzed the difficulty level of the records in KDD data set. Surprisingly,
-                                about 98% of the records in the train set and 86% of the records in the test set
-                                were correctly classified with all the 21 learners.<br />
-                            </label>
-                            <label style="font-family: Times New Roman; font-size: large;">
-                                In order to perform our experiments, we randomly created three smaller subsets of
-                                the KDD train set each of which included fifty thousand records of information.
-                                Each of the learners where trained over the created train sets. We then employed
-                                the 21 learned machines (7 learners, each trained 3 times) to label the records
-                                of the entire KDD train and test sets, which provides us with 21 predicated labels
-                                for each record. Further, we annotated each record of the data set with a <i>#successfulPrediction</i>
-                                value, which was initialized to zero. Now, since the KDD data set provides the correct
-                                label for each record, we compared the predicated label of each record given by
-                                a specific learner with the actual label, where we incremented <i>#successfulPrediction</i>
-                                by one if a match was found. Through this process, we calculated the number of learners
-                                that were able to correctly label that given record. The highest value for <i>#successfulPrediction</i>
-                                is 21, which conveys the fact that all learners were able to correctly predict the
-                                label of that record.
-                            </label>
-                        </td>
-                    </tr>
-                    <tr style="height: 20px;">
-                    </tr>
-                    <tr>
-                        <td style="width: 30px;">
-                        </td>
-                        <td style="width: 470px;">
-                            <img src="KDDTrain1.jpg" border="0" width="430" alt="The distribution of #successfulPrediction values for the
-                                KDD train set records" />
-                        </td>
-                        <td style="width: 30px;">
-                        </td>
-                        <td style="width: 470px; text-align: justify;">
-                            <img src="KDDTest1.jpg" border="0" width="430" alt="The distribution of #successfulPrediction values for the
-                                KDD test set records" />
-                        </td>
-                    </tr>
-                    <tr style="height: 40px;">
-                        <td style="width: 30px;">
-                        </td>
-                        <td style="width: 470px; text-align: center;">
-                            <label style="font-family: Times New Roman; font-size: medium; font-weight: bolder;">
-                                The distribution of <i>#successfulPrediction</i> values for<br />the KDD train set records</label>
-                        </td>
-                        <td style="width: 30px;">
-                        </td>
-                        <td style="width: 470px; text-align: center;">
-                            <label style="font-family: Times New Roman; font-size: medium; font-weight: bolder;">
-                                The distribution of <i>#successfulPrediction</i> values for<br />the KDD test set records</label>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-            <table style="border-collapse: collapse; border-color: #111111; width: 1000px;" id="Table5"
-                border="0" cellpadding="0" cellspacing="0">
-                <tbody>
-                    <tr style="height: 30px;">
-                    </tr>
-                    <tr>
-                        <td colspan="2" style="width: 100%; height: 100%; vertical-align: middle; text-align: left;">
-                            <label style="font-family: Times New Roman; font-weight: bolder; font-size: x-large;">
-                                Refrences</label>
-                        </td>
-                    </tr>
-                    <tr style="height: 20px;">
-                    </tr>
-                    <tr>
-                        <td style="width: 100%; text-align: justify;">
-                            <label style="font-family: Times New Roman; font-size: large;">
-                                [1] M. Tavallaee, E. Bagheri, W. Lu, and A. Ghorbani, �A Detailed Analysis of the
-                                KDD CUP 99 Data Set,� <i>Submitted to Second IEEE Symposium on Computational Intelligence
-                                    for Security and Defense Applications (CISDA)</i>, 2009.
-                                <br />
-                                <br />
-                                [2] J. McHugh, �Testing intrusion detection systems: a critique of the 1998 and
-                                1999 darpa intrusion detection system evaluations as performed by lincoln laboratory,�
-                                <i>ACM Transactions on Information and System Security</i>, vol. 3, no. 4, pp. 262�294,
-                                2000.
-                            </label>
-                        </td>
-                    </tr>
-                    <tr style="height: 70px;">
-                    </tr>
-                </tbody>
-            </table>
-        </center>
+<body>
+
+    <header>
+        <div>
+            <h1>Intelligent IDS Dashboard</h1>
+            <div class="subtitle">Propulsé par XGBoost, SMOTE & FastAPI</div>
+        </div>
+        <div class="api-status">
+            <div class="pulse" id="status-pulse"></div>
+            <span id="status-text">API Déconnectée</span>
+        </div>
+    </header>
+
+    <div class="dashboard-grid">
+        <!-- Left Panel: Metrics -->
+        <div class="glass-panel">
+            <div class="panel-title">Performances du Modèle</div>
+            
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-lbl">Accuracy Globale</div>
+                    <div class="metric-val">78.95%</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-lbl">F1-Score Macro</div>
+                    <div class="metric-val">0.63</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-lbl">Détection DoS</div>
+                    <div class="metric-val">96.6%</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-lbl">Latence Inférence</div>
+                    <div class="metric-val">~7 ms</div>
+                </div>
+            </div>
+
+            <div class="panel-title" style="margin-top: 2rem;">Visualisations</div>
+            <div class="charts">
+                <img src="confusion_matrices_optimized.png" alt="Confusion Matrix">
+                <img src="feature_importance_optimized.png" alt="Feature Importance">
+            </div>
+        </div>
+
+        <!-- Right Panel: Live Feed -->
+        <div class="glass-panel">
+            <div class="panel-title">
+                Flux Réseau Temps Réel
+                <span id="speed-indicator" style="color: var(--accent-blue); font-family: monospace; font-size: 0.9rem;"></span>
+            </div>
+            
+            <div class="controls">
+                <button id="toggle-feed">▶ Démarrer la Simulation</button>
+            </div>
+
+            <div class="feed-container" id="feed-container">
+                <!-- Rows injected by JS -->
+            </div>
+        </div>
     </div>
+
+    <script>
+        const API_URL = "http://127.0.0.1:8000";
+        let isRunning = false;
+        let intervalId = null;
+
+        const pulse = document.getElementById('status-pulse');
+        const statusText = document.getElementById('status-text');
+        const feedContainer = document.getElementById('feed-container');
+        const toggleBtn = document.getElementById('toggle-feed');
+
+        // Check API Status on load
+        async function checkAPI() {
+            try {
+                const res = await fetch(API_URL + "/");
+                if (res.ok) {
+                    pulse.classList.add('active');
+                    statusText.textContent = "API Connectée";
+                    return true;
+                }
+            } catch (e) {
+                pulse.classList.remove('active');
+                statusText.textContent = "API Déconnectée (Lancez uvicorn)";
+            }
+            return false;
+        }
+        checkAPI();
+
+        async function fetchPrediction() {
+            try {
+                const res = await fetch(API_URL + "/predict/random");
+                const data = await res.json();
+                renderRow(data);
+            } catch (e) {
+                console.error("API Fetch Error", e);
+                stopFeed();
+            }
+        }
+
+        function renderRow(data) {
+            const isAttack = data.prediction !== 'Normal';
+            const rowClass = isAttack ? 'conn-attack' : 'conn-normal';
+            const badgeClass = isAttack ? 'bg-attack' : 'bg-normal';
+            
+            // Format details
+            const proto = data.network_data.protocol_type.toUpperCase();
+            const srv = data.network_data.service;
+            const bytes = `${data.network_data.src_bytes}B / ${data.network_data.dst_bytes}B`;
+
+            const row = document.createElement('div');
+            row.className = `connection-row ${rowClass}`;
+            
+            row.innerHTML = `
+                <div>
+                    <div class="badge ${badgeClass}">${data.prediction}</div>
+                </div>
+                <div class="conn-details">
+                    [<span>${proto}</span>] srv:<span>${srv}</span> | flag:<span>${data.network_data.flag}</span> <br>
+                    <small>Traffic: ${bytes}</small>
+                </div>
+                <div>
+                    <small style="color: var(--text-dim)">Confiance</small><br>
+                    <strong>${data.confidence}%</strong>
+                </div>
+                <div class="latency">
+                    ${data.latency_ms} ms
+                </div>
+            `;
+
+            // Insert at top
+            feedContainer.prepend(row);
+
+            // Keep only last 50 items
+            if (feedContainer.children.length > 50) {
+                feedContainer.removeChild(feedContainer.lastChild);
+            }
+        }
+
+        function toggleFeed() {
+            if (isRunning) {
+                stopFeed();
+            } else {
+                startFeed();
+            }
+        }
+
+        async function startFeed() {
+            const ok = await checkAPI();
+            if (!ok) {
+                alert("Impossible de se connecter à l'API. Avez-vous lancé le serveur 'uvicorn api:app' ?");
+                return;
+            }
+            isRunning = true;
+            toggleBtn.textContent = "⏸ Mettre en pause";
+            toggleBtn.classList.add('running');
+            
+            // Fetch every 1s
+            intervalId = setInterval(fetchPrediction, 1000);
+            fetchPrediction(); // call first immediately
+        }
+
+        function stopFeed() {
+            isRunning = false;
+            toggleBtn.textContent = "▶ Démarrer la Simulation";
+            toggleBtn.classList.remove('running');
+            clearInterval(intervalId);
+        }
+
+        toggleBtn.addEventListener('click', toggleFeed);
+    </script>
 </body>
 </html>

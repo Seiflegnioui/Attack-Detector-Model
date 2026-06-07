@@ -1,0 +1,28 @@
+# Dossiers virtuels et Git
+venv/
+.env/
+__pycache__/
+.git/
+.gitignore
+
+# Les notebooks de recherche (inutiles en production)
+*.ipynb
+
+# Les modèles intermédiaires (on ne garde que les bons)
+*.pkl
+!best_model_cv.pkl
+!scaler.pkl
+
+# Les graphiques (servis par le Nginx directement depuis le dossier hôte)
+*.png
+
+# Les scripts d'entraînement
+run_models.py
+run_advanced_models.py
+
+# Les autres fichiers de test non nécessaires au pipeline
+KDDTest-21*
+KDDTrain+_20Percent*
+
+# Fichiers UI front-end (gérés par le conteneur Nginx)
+index.html
