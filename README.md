@@ -114,4 +114,4 @@ Double-cliquez simplement sur le fichier **`index.html`** dans votre navigateur 
 
 ---
 
-*Projet de Fin de Module — Seif Legnioui*
+*Projet de Fin de Module*
