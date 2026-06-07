@@ -45,8 +45,8 @@ columns = [
     'dst_host_rerror_rate', 'dst_host_srv_rerror_rate', 'label', 'difficulty_level'
 ]
 
-train_df = pd.read_csv('KDDTrain+.txt', names=columns)
-test_df = pd.read_csv('KDDTest+.txt', names=columns)
+train_df = pd.read_csv('data/KDDTrain+.txt', names=columns)
+test_df = pd.read_csv('data/KDDTest+.txt', names=columns)
 train_df = train_df.drop('difficulty_level', axis=1)
 test_df = test_df.drop('difficulty_level', axis=1)
 print(f"\n📊 Training set : {train_df.shape[0]:,} lignes")
@@ -185,7 +185,7 @@ axes[1].set_title('XGBoost — Confusion Matrix', fontsize=14, fontweight='bold'
 axes[1].set_ylabel('Vrai label'); axes[1].set_xlabel('Label prédit')
 
 plt.tight_layout()
-plt.savefig('confusion_matrices.png', dpi=150, bbox_inches='tight')
+plt.savefig('reports/confusion_matrices.png', dpi=300, bbox_inches='tight')
 print("\n💾 confusion_matrices.png")
 
 # Comparison bar chart
@@ -205,7 +205,7 @@ for ax, metric_rf, metric_xgb, title in [
 
 plt.suptitle('Comparaison Random Forest vs XGBoost', fontsize=16, fontweight='bold', y=1.02)
 plt.tight_layout()
-plt.savefig('model_comparison.png', dpi=150, bbox_inches='tight')
+plt.savefig('reports/model_comparison.png', dpi=300, bbox_inches='tight')
 print("💾 model_comparison.png")
 
 # ROC curves
@@ -223,7 +223,7 @@ for ax, y_proba, title in [(axes[0], rf_y_proba, 'Random Forest'), (axes[1], xgb
     ax.legend(loc='lower right'); ax.grid(alpha=0.3)
 
 plt.tight_layout()
-plt.savefig('roc_curves.png', dpi=150, bbox_inches='tight')
+plt.savefig('reports/roc_curves.png', dpi=300, bbox_inches='tight')
 print("💾 roc_curves.png")
 
 # Feature importance
@@ -236,19 +236,20 @@ axes[0].set_title('Random Forest — Top 20 Features', fontsize=14, fontweight='
 xgb_imp.sort_values().plot(kind='barh', ax=axes[1], color='#e74c3c', alpha=0.85)
 axes[1].set_title('XGBoost — Top 20 Features', fontsize=14, fontweight='bold')
 plt.tight_layout()
-plt.savefig('feature_importance.png', dpi=150, bbox_inches='tight')
+plt.savefig('reports/feature_importance.png', dpi=300, bbox_inches='tight')
 print("💾 feature_importance.png")
 
 # --- Save models ---
-joblib.dump(rf_model, 'rf_model.pkl')
-joblib.dump(xgb_model, 'xgb_model.pkl')
-joblib.dump(scaler, 'scaler.pkl')
+joblib.dump(xgb_model, 'models/xgb_model.pkl')
+joblib.dump(rf_model, 'models/rf_model.pkl')
+joblib.dump(scaler, 'models/scaler.pkl')
 
 rf_f1_macro = f1_score(y_test, rf_y_pred, average='macro')
 xgb_f1_macro = f1_score(y_test, xgb_y_pred, average='macro')
 
 if xgb_f1_macro > rf_f1_macro:
-    joblib.dump(xgb_model, 'best_model.pkl')
+    best_model = xgb_model
+    joblib.dump(best_model, 'models/best_model.pkl')
     print(f"\n🏆 Meilleur modèle : XGBoost (F1 Macro: {xgb_f1_macro:.4f})")
 else:
     joblib.dump(rf_model, 'best_model.pkl')

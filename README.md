@@ -114,6 +114,17 @@ Un bon IDS ne sert à rien s'il ralentit le trafic réseau. Nous avons benchmark
 
 Ce projet n'est plus qu'un simple script, c'est un produit complet. Vous avez deux options pour le lancer :
 
+## ⚙️ Génération des modèles (étape obligatoire)
+
+Avant de lancer l'API ou Docker, vous devez entraîner et générer les modèles en local. Les modèles (`.pkl`) ne sont pas versionnés sur GitHub pour des raisons de bonnes pratiques MLOps.
+
+```bash
+# Depuis la racine du projet
+python src/run_advanced_models.py
+```
+
+Cette commande génère `models/best_model_cv.pkl`, `models/scaler.pkl`, et `models/model_columns.pkl` qui sont requis par l'API.
+
 ### Option A : Déploiement Docker (Recommandé / MLOps)
 Le projet est entièrement conteneurisé. L'API et le Dashboard tournent dans des conteneurs séparés.
 ```bash
