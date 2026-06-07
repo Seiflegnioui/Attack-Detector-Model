@@ -108,6 +108,9 @@ Un bon IDS ne sert à rien s'il ralentit le trafic réseau. Nous avons benchmark
 
 > **Conclusion** : Le système est capable de classer plus de **45 000 connexions par seconde** sur un processeur standard. L'exigence du "temps réel" est pleinement validée.
 
+### Limites et Perspectives (Architecture réelle)
+Ce projet reproduit l'inférence *stateless* sur des flux de connexions (concept central de Morpheus) en utilisant un modèle pré-entraîné couplé à une API performante. Cependant, pour une implémentation Morpheus de classe entreprise, il faudrait ajouter une infrastructure réseau asynchrone complète, notamment l'utilisation de **Kafka** pour l'ingestion massive des flux de télémétrie, et **Triton Inference Server** pour distribuer l'inférence directement sur les GPUs. L'utilisation native du SDK NVIDIA Morpheus permettrait d'orchestrer ces pipelines.
+
 ---
 
 ## 🚀 Déploiement & Lancement

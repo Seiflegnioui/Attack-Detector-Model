@@ -13,6 +13,9 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copie des fichiers vitaux pour l'API (Code, Modèles, Scaler)
+# PRE-REQUIS : les modèles .pkl doivent être générés en local AVANT ce build.
+# Commande : python src/run_advanced_models.py (depuis la racine du projet)
+# Les fichiers générés : models/best_model_cv.pkl, models/scaler.pkl, models/model_columns.pkl
 COPY api/api.py .
 COPY models/best_model_cv.pkl models/
 COPY models/scaler.pkl models/
