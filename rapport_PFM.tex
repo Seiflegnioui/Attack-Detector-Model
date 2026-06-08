@@ -159,8 +159,8 @@ Deux architectures de pointe spécialisées dans les données tabulaires ont ét
     \item \textbf{XGBoost} : Modèle basé sur le \textit{Gradient Boosting}. Il construit les arbres de manière séquentielle, chaque nouvel arbre tentant de corriger les erreurs résiduelles des arbres précédents.
 \end{itemize}
 
-\section{Évaluation sur le Jeu de Test}
-Il est crucial de noter que le jeu de test NSL-KDD intègre des types d'attaques inédites non présentes lors de l'entraînement. Les performances mesurent donc la véritable capacité d'extrapolation de l'Intelligence Artificielle.
+\section{Évaluation Quantitative Globale}
+Le test final a été réalisé sur le jeu de test NSL-KDD, qui inclut des attaques inédites (non présentes dans le jeu d'entraînement), évaluant ainsi la capacité réelle de généralisation du modèle.
 
 \begin{table}[H]
     \centering
@@ -176,8 +176,45 @@ Il est crucial de noter que le jeu de test NSL-KDD intègre des types d'attaques
     \caption{Comparaison des scores globaux}
 \end{table}
 
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{reports/model_comparison_optimized.png}
+    \caption{Comparaison détaillée par classe (F1-Score, Précision, Rappel) entre Random Forest et XGBoost.}
+    \label{fig:comparison}
+\end{figure}
+
+Comme l'illustre la figure \ref{fig:comparison}, XGBoost surpasse systématiquement Random Forest, particulièrement sur la capacité de rappel (Recall) des classes critiques.
+
 \section{Analyse des Matrices de Confusion}
-Le F1-Score Macro met en exergue la supériorité d'XGBoost. Grâce au pipeline SMOTE, la classe \textbf{U2R} a vu son F1-Score passer d'une valeur marginale à \textbf{0.46}, avec une précision de 71.88\%. Les attaques \textbf{R2L} affichent quant à elles une précision de \textbf{97.11\%}. Les algorithmes ont donc appris la sémantique de l'attaque plutôt que de simplement mémoriser les labels majoritaires.
+Le F1-Score Macro met en exergue la supériorité d'XGBoost. La figure \ref{fig:confusion} montre les détails des prédictions.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{reports/confusion_matrices_optimized.png}
+    \caption{Matrices de confusion de Random Forest et XGBoost sur le jeu de test NSL-KDD.}
+    \label{fig:confusion}
+\end{figure}
+
+Grâce au pipeline SMOTE, la classe \textbf{U2R} a vu son F1-Score passer d'une valeur marginale à \textbf{0.46}, avec une précision de 71.88\%. Les attaques \textbf{R2L} affichent quant à elles une précision de \textbf{97.11\%}. Les algorithmes ont donc appris la sémantique de l'attaque plutôt que de simplement mémoriser les labels majoritaires.
+
+\section{Courbes ROC et Importance des Caractéristiques}
+Pour évaluer la capacité des modèles à distinguer parfaitement chaque classe des autres, l'analyse des courbes ROC (Receiver Operating Characteristic) est primordiale (Figure \ref{fig:roc}).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{reports/roc_curves_optimized.png}
+    \caption{Courbes ROC (One-vs-Rest) pour les deux modèles avec l'aire sous la courbe (AUC) par classe.}
+    \label{fig:roc}
+\end{figure}
+
+Les modèles s'appuient sur un sous-ensemble de variables très discriminantes. La figure \ref{fig:importance} présente les caractéristiques qui contribuent le plus aux décisions de l'algorithme, telles que les taux d'erreurs TCP (\texttt{dst\_host\_srv\_serror\_rate}) ou l'identification du protocole ICMP.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{reports/feature_importance_optimized.png}
+    \caption{Top 20 des caractéristiques (Features) les plus importantes selon chaque modèle.}
+    \label{fig:importance}
+\end{figure}
 
 \section{L'Inspiration Morpheus : Benchmark de Latence}
 Puisque le but ultime est une détection temps réel sur un trafic réseau à haute vélocité (concept central de NVIDIA Morpheus), nous avons mesuré la latence d'inférence brute du modèle XGBoost final :
@@ -186,7 +223,7 @@ Puisque le but ultime est une détection temps réel sur un trafic réseau à ha
     \item Batch intermédiaire (1 000 connexions) : $\sim 28$ ms
     \item Grand Batch (10 000 connexions) : $\sim 218$ ms
 \end{itemize}
-Ces métriques valident que le modèle est capable de traiter plus de 45 000 paquets par seconde sur une architecture standard, évitant ainsi le risque d'engorgement du réseau lié à la sécurité.
+Ces métriques valident que le système est capable de traiter plus de 45 000 paquets par seconde sur une architecture standard, évitant ainsi le risque d'engorgement du réseau lié à la sécurité.
 
 % ---------------------------------------------------------
 % CHAPITRE 5
