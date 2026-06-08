@@ -1,7 +1,12 @@
 \documentclass[12pt,a4paper]{report}
+
+% ═══════════════════════════════════════════
+% PACKAGES
+% ═══════════════════════════════════════════
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
 \usepackage[french]{babel}
+\usepackage{lmodern}
 \usepackage{amsmath, amsfonts, amssymb}
 \usepackage{graphicx}
 \usepackage{geometry}
@@ -11,251 +16,893 @@
 \usepackage{subcaption}
 \usepackage{float}
 \usepackage{xcolor}
-\usepackage{titlesec}
 \usepackage{fancyhdr}
 \usepackage{enumitem}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{listings}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+\usepackage{setspace}
+\usepackage{parskip}
 
-% Configuration de la géométrie de la page
+% ═══════════════════════════════════════════
+% CONFIGURATION
+% ═══════════════════════════════════════════
 \geometry{top=2.5cm, bottom=2.5cm, left=3cm, right=2.5cm}
+\setstretch{1.25}
 
-% Configuration des hyperliens
 \hypersetup{
     colorlinks=true,
-    linkcolor=blue,
-    filecolor=magenta,      
-    urlcolor=cyan,
-    pdftitle={Rapport de Projet de Fin de Module},
-    pdfauthor={Seif Legnioui},
+    linkcolor=blue!70!black,
+    citecolor=green!50!black,
+    urlcolor=cyan!70!black,
+    pdftitle={Rapport PFM — IDS par Machine Learning},
 }
 
-% Configuration des en-têtes et pieds de page
 \pagestyle{fancy}
 \fancyhf{}
-\fancyhead[L]{\leftmark}
+\fancyhead[L]{\small\nouppercase{\leftmark}}
+\fancyhead[R]{\small Projet de Fin de Module}
 \fancyfoot[C]{\thepage}
 \renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+
+% Style des listings code
+\lstset{
+    basicstyle=\small\ttfamily,
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{gray!5},
+    rulecolor=\color{gray!30},
+    keywordstyle=\color{blue!70!black},
+    commentstyle=\color{green!50!black},
+    stringstyle=\color{red!60!black},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    numbersep=8pt,
+    tabsize=4,
+    showstringspaces=false,
+    captionpos=b,
+    language=Python,
+}
+
+% Traduction algorithme
+\renewcommand{\algorithmicrequire}{\textbf{Entrée :}}
+\renewcommand{\algorithmicensure}{\textbf{Sortie :}}
+\renewcommand{\algorithmicif}{\textbf{Si}}
+\renewcommand{\algorithmicthen}{\textbf{alors}}
+\renewcommand{\algorithmicelse}{\textbf{sinon}}
+\renewcommand{\algorithmicfor}{\textbf{Pour}}
+\renewcommand{\algorithmicdo}{\textbf{faire}}
+\renewcommand{\algorithmicreturn}{\textbf{Retourner}}
 
 \begin{document}
 
-% ---------------------------------------------------------
+% ═══════════════════════════════════════════
 % PAGE DE GARDE
-% ---------------------------------------------------------
+% ═══════════════════════════════════════════
 \begin{titlepage}
     \centering
-    \vspace*{1cm}
+    \vspace*{2cm}
     
-    {\scshape\LARGE Rapport de Projet de Fin de Module \par}
-    \vspace{1.5cm}
+    {\large\textsc{Master 1 — Module de Machine Learning}\par}
+    \vspace{0.8cm}
     
-    {\huge\bfseries Conception et Implémentation d'un Système de Détection d'Intrusions (IDS) Basé sur le Machine Learning\par}
+    \rule{\textwidth}{0.5pt}
+    \vspace{0.8cm}
+    {\LARGE\bfseries Conception et Implémentation d'un\\Système de Détection d'Intrusions Réseau\\Basé sur le Machine Learning\par}
     \vspace{0.5cm}
-    {\Large \textit{Inspiré de l'architecture NVIDIA Morpheus}}
+    {\large\itshape Application sur le Dataset NSL-KDD\par}
+    \vspace{0.3cm}
+    \rule{\textwidth}{0.5pt}
     
-    \vspace{2cm}
+    \vspace{2.5cm}
     
-    \textbf{Présenté par :}\\
-    {\Large Seif Legnioui}
+    {\large\textbf{Rapport de Projet de Fin de Module}\par}
     
-    \vspace{2cm}
-    \textbf{Dans le cadre du module de Machine Learning et MLOps}
+    \vspace{3cm}
+    
+    {\large\textbf{Module :} Machine Learning\par}
     
     \vfill
     
-    {\large \today\par}
+    {\large Année universitaire 2025--2026\par}
 \end{titlepage}
 
-% ---------------------------------------------------------
-% REMERCIEMENTS & RESUME
-% ---------------------------------------------------------
-\chapter*{Remerciements}
-\addcontentsline{toc}{chapter}{Remerciements}
-Je tiens à remercier sincèrement l'équipe pédagogique et mes encadrants pour leurs précieux conseils tout au long de ce module. Les connaissances acquises en ingénierie des données, en modélisation et en mise en production (MLOps) ont été fondamentales pour mener à bien ce projet ambitieux.
+% ═══════════════════════════════════════════
+% PAGES PRÉLIMINAIRES
+% ═══════════════════════════════════════════
+\pagenumbering{roman}
 
 \chapter*{Résumé}
 \addcontentsline{toc}{chapter}{Résumé}
-La détection d'intrusions réseau est devenue un défi majeur en cybersécurité. Face au volume croissant du trafic et à la complexité des attaques, les systèmes classiques basés sur des signatures s'avèrent insuffisants. Ce projet présente le développement complet d'un Système de Détection d'Intrusions (IDS) temps réel, basé sur des algorithmes d'apprentissage automatique (Machine Learning). Utilisant le jeu de données de référence NSL-KDD, nous avons développé un pipeline analytique robuste intégrant la gestion du déséquilibre extrême des classes via SMOTE, couplé à une optimisation rigoureuse des hyperparamètres par validation croisée. Les modèles Random Forest et XGBoost ont été comparés, ce dernier démontrant des performances supérieures, notamment sur la détection des attaques critiques (U2R et R2L). L'ensemble a été industrialisé sous forme d'une API FastAPI asynchrone et conteneurisé avec Docker, validant ainsi la viabilité d'une architecture d'inférence réseau à très haute vitesse.
 
+La détection d'intrusions réseau constitue un enjeu majeur de la cybersécurité moderne. Les systèmes classiques, fondés sur des bases de signatures statiques, peinent à détecter les attaques inédites (\textit{Zero-Day}) et les comportements anormaux subtils. Ce projet propose une approche alternative basée sur l'apprentissage automatique (\textit{Machine Learning}) pour la classification du trafic réseau en temps réel.
+
+En utilisant le jeu de données de référence NSL-KDD, composé de 125\,973 connexions d'entraînement décrites par 41 attributs, nous avons développé un pipeline analytique complet couvrant le prétraitement des données, la gestion du déséquilibre extrême des classes via la technique SMOTE (\textit{Synthetic Minority Over-sampling Technique}), et l'optimisation rigoureuse des hyperparamètres par validation croisée stratifiée.
+
+Deux algorithmes ensemblistes ont été comparés : Random Forest (Bagging) et XGBoost (Gradient Boosting). Les résultats montrent que XGBoost, couplé au pipeline SMOTE, atteint une exactitude de 78,95\% et un F1-Score Macro de 0,631, avec des performances remarquables sur les classes minoritaires critiques : une précision de 97,11\% pour les attaques R2L et un F1-Score de 0,46 pour les attaques U2R (contre 0,04\% de représentation dans le dataset).
+
+L'ensemble a été industrialisé sous forme d'une API REST asynchrone (FastAPI), d'un tableau de bord interactif, et conteneurisé via Docker, démontrant la faisabilité d'un IDS intelligent capable de traiter plus de 45\,000 connexions par seconde.
+
+\textbf{Mots-clés :} Détection d'intrusions, Machine Learning, XGBoost, Random Forest, SMOTE, NSL-KDD, Classification multiclasse, Déséquilibre de classes, FastAPI, Docker.
+
+\vspace{1cm}
+
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+
+Network intrusion detection is a critical challenge in modern cybersecurity. Traditional signature-based systems fail to detect unknown (\textit{Zero-Day}) attacks and subtle anomalous behaviors. This project proposes a Machine Learning-based approach for real-time network traffic classification.
+
+Using the NSL-KDD benchmark dataset (125,973 training connections, 41 features), we developed a complete analytical pipeline covering data preprocessing, extreme class imbalance handling via SMOTE, and rigorous hyperparameter optimization through stratified cross-validation.
+
+Two ensemble algorithms were compared: Random Forest (Bagging) and XGBoost (Gradient Boosting). XGBoost coupled with the SMOTE pipeline achieved 78.95\% accuracy and a Macro F1-Score of 0.631, with remarkable performance on critical minority classes: 97.11\% precision for R2L attacks and a 0.46 F1-Score for U2R attacks. The system was deployed as a FastAPI REST API with Docker containerization, capable of processing over 45,000 connections per second.
+
+\textbf{Keywords:} Intrusion Detection, Machine Learning, XGBoost, Random Forest, SMOTE, NSL-KDD, Multiclass Classification, Class Imbalance, FastAPI, Docker.
+
+% ═══════════════════════════════════════════
+% TABLE DES MATIÈRES
+% ═══════════════════════════════════════════
 \tableofcontents
 \listoffigures
 \listoftables
 
-% ---------------------------------------------------------
-% CHAPITRE 1
-% ---------------------------------------------------------
+\newpage
+\pagenumbering{arabic}
+
+% ═══════════════════════════════════════════
+% CHAPITRE 1 — INTRODUCTION
+% ═══════════════════════════════════════════
 \chapter{Introduction Générale}
 
-\section{Contexte et Problématique}
-Avec l'explosion du cloud computing et de l'Internet des Objets (IoT), les réseaux informatiques génèrent chaque seconde des volumes massifs de trafic. En parallèle, les cyberattaques (Déni de Service, ransomwares, élévation de privilèges) se multiplient et se diversifient, exploitant la moindre vulnérabilité. 
+\section{Contexte}
 
-Historiquement, les systèmes de détection d'intrusions (IDS) s'appuyaient sur des bases de signatures (comme l'antivirus classique) pour identifier des schémas d'attaques connus. Or, cette méthode ne permet pas de détecter les attaques \textit{Zero-Day} ou les comportements déviants subtils. L'Intelligence Artificielle, et plus particulièrement le \textit{Machine Learning}, propose une approche comportementale : apprendre ce qu'est un trafic normal ou malveillant à partir des caractéristiques statistiques des connexions réseau.
+L'ère numérique a transformé radicalement les infrastructures informatiques mondiales. Avec la démocratisation du cloud computing, la prolifération de l'Internet des Objets (IoT) et la généralisation du travail à distance, les réseaux d'entreprise sont devenus à la fois plus complexes et plus exposés aux menaces. Selon les rapports de l'ANSSI (Agence Nationale de la Sécurité des Systèmes d'Information), le nombre d'incidents de cybersécurité signalés en France a augmenté de manière exponentielle au cours des dernières années.
 
-\section{Objectifs du Projet}
-L'objectif principal de ce projet de fin de module est de concevoir un IDS intelligent de bout en bout. Les objectifs spécifiques sont les suivants :
-\begin{itemize}
-    \item \textbf{Ingénierie des données} : Prétraiter un jeu de données réseau complexe (NSL-KDD) comportant 41 variables et des classes extrêmement déséquilibrées.
-    \item \textbf{Modélisation ML} : Entraîner et comparer des algorithmes ensemblistes performants (Random Forest, XGBoost) capables de détecter des attaques très rares sans surapprentissage.
-    \item \textbf{Industrialisation (MLOps)} : Transformer le modèle en un véritable produit logiciel (API temps réel et Dashboard interactif) et le conteneuriser via Docker.
+Les cyberattaques modernes ne se limitent plus aux simples virus informatiques. Elles englobent un spectre large et sophistiqué : les attaques par déni de service distribué (DDoS) qui paralysent les serveurs, les intrusions furtives de type \textit{Remote-to-Local} (R2L) qui exploitent les vulnérabilités des services réseau à distance, les élévations de privilèges \textit{User-to-Root} (U2R) qui permettent à un attaquant d'obtenir un contrôle total sur une machine, et les opérations de reconnaissance (\textit{Probe}) qui cartographient les failles d'un réseau avant une attaque ciblée.
+
+Face à cette menace grandissante, les Systèmes de Détection d'Intrusions (\textit{Intrusion Detection Systems}, IDS) jouent un rôle de sentinelle au sein des architectures de sécurité réseau. Historiquement, deux grandes approches ont été adoptées pour la détection :
+
+\begin{itemize}[leftmargin=2cm]
+    \item \textbf{La détection par signatures} (\textit{Misuse Detection}) : elle compare chaque paquet réseau à une base de données de motifs d'attaques connus. C'est le principe des systèmes comme Snort ou Suricata. Cette méthode est efficace contre les menaces documentées mais totalement aveugle face aux attaques \textit{Zero-Day}, c'est-à-dire celles qui exploitent des vulnérabilités encore inconnues.
+    
+    \item \textbf{La détection par anomalies} (\textit{Anomaly Detection}) : elle consiste à modéliser le comportement \og normal \fg{} du réseau et à signaler tout écart significatif. Cette approche est intrinsèquement capable de détecter des attaques inconnues, mais souffre d'un taux élevé de faux positifs.
 \end{itemize}
 
-% ---------------------------------------------------------
-% CHAPITRE 2
-% ---------------------------------------------------------
+Le Machine Learning offre un paradigme puissant pour la détection par anomalies. Plutôt que de programmer manuellement des règles de détection, les algorithmes d'apprentissage automatique peuvent \textit{apprendre} les caractéristiques discriminantes du trafic normal et malveillant directement à partir de grandes quantités de données historiques.
+
+\section{Problématique}
+
+La problématique centrale de ce projet peut être formulée ainsi :
+
+\begin{quote}
+    \textit{Comment concevoir un système de détection d'intrusions réseau capable de classifier efficacement le trafic en temps réel, y compris les attaques extrêmement rares, en utilisant des techniques d'apprentissage automatique supervisé ?}
+\end{quote}
+
+Cette problématique soulève plusieurs sous-questions techniques :
+\begin{enumerate}
+    \item Comment gérer un déséquilibre extrême des classes, où certaines catégories d'attaques représentent moins de 0,04\% du dataset ?
+    \item Quel algorithme de classification multiclasse offre le meilleur compromis entre précision globale et détection des classes minoritaires ?
+    \item Comment industrialiser le modèle entraîné pour qu'il soit exploitable dans un contexte de surveillance réseau en temps réel ?
+\end{enumerate}
+
+\section{Objectifs du projet}
+
+Les objectifs de ce projet de fin de module sont les suivants :
+
+\begin{enumerate}[leftmargin=2cm]
+    \item \textbf{Exploration et prétraitement des données} : réaliser une analyse exploratoire approfondie du dataset NSL-KDD, comprendre la nature de chaque attribut, et appliquer les transformations nécessaires (encodage, normalisation).
+    
+    \item \textbf{Gestion du déséquilibre} : mettre en œuvre la technique SMOTE dans un pipeline rigoureux empêchant toute fuite de données (\textit{Data Leakage}).
+    
+    \item \textbf{Modélisation et comparaison} : entraîner et comparer deux algorithmes ensemblistes de référence (Random Forest et XGBoost) avec optimisation des hyperparamètres par validation croisée stratifiée.
+    
+    \item \textbf{Évaluation rigoureuse} : analyser les performances à l'aide de métriques adaptées aux données déséquilibrées (F1-Score Macro, matrices de confusion, courbes ROC).
+    
+    \item \textbf{Déploiement} : transformer le modèle en un produit logiciel exploitable via une API REST et un tableau de bord interactif, le tout conteneurisé avec Docker.
+\end{enumerate}
+
+\section{Organisation du rapport}
+
+Ce rapport est structuré en six chapitres. Après cette introduction, le \textbf{Chapitre 2} présente le dataset NSL-KDD et l'analyse exploratoire des données. Le \textbf{Chapitre 3} détaille les méthodes de prétraitement, la technique SMOTE et la stratégie d'optimisation des hyperparamètres. Le \textbf{Chapitre 4} décrit les fondements théoriques des algorithmes utilisés. Le \textbf{Chapitre 5} présente et analyse les résultats expérimentaux. Le \textbf{Chapitre 6} couvre l'industrialisation et le déploiement. Enfin, le \textbf{Chapitre 7} conclut le rapport et propose des perspectives d'amélioration.
+
+
+% ═══════════════════════════════════════════
+% CHAPITRE 2 — DATASET ET EDA
+% ═══════════════════════════════════════════
 \chapter{Jeu de Données et Analyse Exploratoire}
 
-\section{Le Dataset NSL-KDD}
-Le projet s'appuie sur le dataset public \textbf{NSL-KDD}, qui est une révision majeure du célèbre jeu de données KDD Cup 1999. Il résout les problèmes de redondance inhérents à la version originale, empêchant les algorithmes d'être biaisés vers les classes majoritaires fréquentes.
-Le jeu de données comprend un total de 125 973 connexions pour l'entraînement et 22 544 connexions pour les tests. Chaque connexion est décrite par 41 attributs répartis en quatre catégories :
+\section{Présentation du dataset NSL-KDD}
+
+Le projet s'appuie sur le dataset \textbf{NSL-KDD}, qui constitue une version améliorée du célèbre jeu de données KDD Cup 1999, lui-même issu du programme d'évaluation des IDS de la DARPA (1998). Le dataset original KDD'99 souffrait de deux problèmes majeurs :
+
 \begin{itemize}
-    \item \textbf{Caractéristiques basiques} : extraites des en-têtes TCP/IP (ex: durée, protocole, taille en octets).
-    \item \textbf{Caractéristiques de contenu} : liées à la charge utile, utiles pour repérer les attaques U2R et R2L (ex: échec de login, accès root).
-    \item \textbf{Caractéristiques de trafic temporel (Time-based)} : calculées sur une fenêtre de 2 secondes.
-    \item \textbf{Caractéristiques de trafic d'hôte (Host-based)} : statistiques évaluées sur un grand nombre de connexions vers la même machine.
+    \item \textbf{Redondance massive} : environ 78\% des enregistrements d'entraînement et 75\% des enregistrements de test étaient des doublons, biaisant les algorithmes vers la simple mémorisation.
+    \item \textbf{Évaluation non fiable} : la présence de doublons dans le jeu de test rendait les métriques de performance artificiellement élevées.
 \end{itemize}
 
-\section{Taxonomie des Attaques et Déséquilibre}
-Le jeu d'entraînement contient 39 sous-types d'attaques. Pour un apprentissage pertinent, nous les avons agrégées en 5 grandes classes standards :
-\begin{enumerate}
-    \item \textbf{Normal (53.5\%)} : Trafic de fond légitime.
-    \item \textbf{DoS (36.5\%)} : \textit{Denial of Service}, visant à paralyser une ressource.
-    \item \textbf{Probe (9.3\%)} : Sondage de ports et cartographie du réseau.
-    \item \textbf{R2L (0.8\%)} : \textit{Remote to Local}, accès non autorisé à distance.
-    \item \textbf{U2R (0.04\%)} : \textit{User to Root}, élévation de privilèges critique.
-\end{enumerate}
-Ce déséquilibre drastique (seulement 52 exemples U2R contre 67 000 normaux) constitue le défi mathématique principal du projet. Un algorithme naïf prédirait toujours la classe "Normal" pour obtenir une exactitude (accuracy) trompeuse de 99\%.
-
-% ---------------------------------------------------------
-% CHAPITRE 3
-% ---------------------------------------------------------
-\chapter{Prétraitement et Méthodologie d'Apprentissage}
-
-\section{Ingénierie des Caractéristiques (Feature Engineering)}
-Afin de rendre les données exploitables par nos modèles, plusieurs étapes de prétraitement ont été appliquées de manière stricte :
-\begin{itemize}
-    \item \textbf{One-Hot Encoding} : Les variables textuelles catégorielles (\texttt{protocol\_type}, \texttt{service}, \texttt{flag}) ont été binarisées. Cette étape a permis d'étendre notre espace de caractéristiques de 41 variables à un vecteur dense de 122 variables.
-    \item \textbf{Standardisation} : Pour éviter qu'une caractéristique avec une forte variance numérique (comme les \texttt{src\_bytes}) ne domine l'apprentissage, nous avons normalisé l'ensemble des données à l'aide d'un \texttt{StandardScaler} ($ \mu = 0, \sigma = 1 $). L'objet \textit{scaler} a été sauvegardé pour garantir la reproductibilité en phase d'inférence.
-\end{itemize}
-
-\section{La Gestion du Déséquilibre : SMOTE et Pipelines}
-Pour pallier la sous-représentation critique des attaques R2L et U2R, nous avons utilisé l'algorithme \textbf{SMOTE} (\textit{Synthetic Minority Over-sampling Technique}). Contrairement à la simple duplication d'échantillons qui entraîne un surapprentissage (overfitting) massif, le SMOTE utilise l'algorithme des K-plus-proches voisins (KNN) pour générer synthétiquement des points de données logiques entre des échantillons existants de la classe minoritaire.
-
-Cependant, appliquer SMOTE sur l'ensemble du dataset avant la validation croisée provoque une fuite de données (Data Leakage). Pour être scientifiquement rigoureux, nous avons implémenté le \texttt{Pipeline} de la librairie \texttt{imbalanced-learn}. Ainsi, les données synthétiques ne sont générées que sur les sous-ensembles d'entraînement lors de chaque itération de la validation croisée, préservant la pureté du sous-ensemble de validation.
-
-\section{Optimisation des Hyperparamètres}
-Plutôt que d'utiliser des paramètres par défaut empiriques, nous avons mis en place une approche systématique :
-\begin{itemize}
-    \item \textbf{RandomizedSearchCV} : Exploration aléatoire de l'espace des hyperparamètres (nombre d'arbres, profondeur maximale, taux d'apprentissage) permettant un excellent compromis entre temps de calcul et optimisation.
-    \item \textbf{Stratified K-Fold} : Une validation croisée à 3 plis, stratifiée pour s'assurer que la proportion de chaque classe (y compris U2R) reste identique dans tous les plis d'évaluation.
-\end{itemize}
-
-% ---------------------------------------------------------
-% CHAPITRE 4
-% ---------------------------------------------------------
-\chapter{Modèles Utilisés et Analyse des Résultats}
-
-\section{Algorithmes en Compétition}
-Deux architectures de pointe spécialisées dans les données tabulaires ont été comparées :
-\begin{itemize}
-    \item \textbf{Random Forest} : Modèle basé sur le principe du \textit{Bagging}. Il construit un grand nombre d'arbres de décision indépendants sur des sous-échantillons aléatoires et vote pour la décision finale, offrant robustesse et stabilité.
-    \item \textbf{XGBoost} : Modèle basé sur le \textit{Gradient Boosting}. Il construit les arbres de manière séquentielle, chaque nouvel arbre tentant de corriger les erreurs résiduelles des arbres précédents.
-\end{itemize}
-
-\section{Évaluation Quantitative Globale}
-Le test final a été réalisé sur le jeu de test NSL-KDD, qui inclut des attaques inédites (non présentes dans le jeu d'entraînement), évaluant ainsi la capacité réelle de généralisation du modèle.
+Le dataset NSL-KDD, proposé par Tavallaee et al. (2009), résout ces problèmes en éliminant les doublons et en ajustant la distribution des exemples. Il comprend :
 
 \begin{table}[H]
     \centering
     \begin{tabular}{lcc}
         \toprule
-        \textbf{Métrique} & \textbf{Random Forest + SMOTE} & \textbf{XGBoost + SMOTE} \\
+        \textbf{Sous-ensemble} & \textbf{Nombre d'instances} & \textbf{Fichier} \\
         \midrule
-        Exactitude Globale & 75.00\% & \textbf{78.95\%} \\
-        F1-Score Macro & 0.5342 & \textbf{0.6314} \\
-        F1-Score Pondéré & 0.7087 & \textbf{0.7582} \\
+        Entraînement complet & 125\,973 & \texttt{KDDTrain+.txt} \\
+        Entraînement 20\% & 25\,192 & \texttt{KDDTrain+\_20Percent.txt} \\
+        Test & 22\,544 & \texttt{KDDTest+.txt} \\
         \bottomrule
     \end{tabular}
-    \caption{Comparaison des scores globaux}
+    \caption{Composition du dataset NSL-KDD.}
+    \label{tab:dataset-composition}
 \end{table}
 
+Chaque connexion réseau est décrite par \textbf{41 attributs} et un label de classe. Ces attributs sont répartis en quatre catégories distinctes, présentées dans le Tableau~\ref{tab:features-categories}.
+
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\textwidth}{lX}
+        \toprule
+        \textbf{Catégorie} & \textbf{Description et exemples} \\
+        \midrule
+        Caractéristiques basiques (9) & Extraites des en-têtes TCP/IP de chaque connexion : durée, type de protocole (\texttt{tcp}, \texttt{udp}, \texttt{icmp}), service réseau (\texttt{http}, \texttt{ftp}, etc.), flag de statut de connexion, et volume de données (\texttt{src\_bytes}, \texttt{dst\_bytes}). \\
+        \addlinespace
+        Caractéristiques de contenu (13) & Liées à la charge utile (payload) de la connexion. Utiles pour les attaques R2L et U2R : nombre de tentatives de login échouées, accès root, création de fichiers, etc. \\
+        \addlinespace
+        Caractéristiques temporelles (9) & Statistiques calculées sur une fenêtre glissante de 2 secondes : taux de connexions au même hôte/service, taux d'erreurs SYN, taux d'erreurs REJ. \\
+        \addlinespace
+        Caractéristiques hôte (10) & Statistiques agrégées sur les 100 dernières connexions vers le même hôte de destination : diversité des services, taux de connexions au même port source. \\
+        \bottomrule
+    \end{tabularx}
+    \caption{Catégories des 41 attributs du dataset NSL-KDD.}
+    \label{tab:features-categories}
+\end{table}
+
+\section{Taxonomie des attaques}
+
+Le jeu de données contient 39 sous-types d'attaques distincts, que nous avons regroupés en \textbf{5 grandes classes} selon la taxonomie standard de la cybersécurité réseau :
+
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\textwidth}{llX}
+        \toprule
+        \textbf{Classe} & \textbf{Type} & \textbf{Description} \\
+        \midrule
+        Normal & Trafic légitime & Connexions réseau bénignes sans intention malveillante. \\
+        \addlinespace
+        DoS & Déni de service & Attaques visant à rendre un service indisponible en le surchargeant de requêtes (ex : \texttt{neptune}, \texttt{smurf}, \texttt{back}). \\
+        \addlinespace
+        Probe & Reconnaissance & Surveillance et cartographie du réseau cible pour identifier les failles et les services vulnérables (ex : \texttt{satan}, \texttt{ipsweep}, \texttt{portsweep}). \\
+        \addlinespace
+        R2L & Accès distant & Tentatives d'accès non autorisé depuis une machine distante en exploitant les vulnérabilités des services réseau (ex : \texttt{guess\_passwd}, \texttt{ftp\_write}). \\
+        \addlinespace
+        U2R & Élévation de privilèges & Attaques où l'attaquant, déjà connecté localement, tente d'obtenir les droits administrateur (\texttt{root}) (ex : \texttt{buffer\_overflow}, \texttt{rootkit}). \\
+        \bottomrule
+    \end{tabularx}
+    \caption{Taxonomie des cinq classes d'attaques dans NSL-KDD.}
+    \label{tab:taxonomie}
+\end{table}
+
+\section{Analyse du déséquilibre des classes}
+
+L'un des défis fondamentaux de ce dataset est le \textbf{déséquilibre extrême} de la distribution des classes. Le Tableau~\ref{tab:desequilibre} illustre cette réalité.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{lccc}
+        \toprule
+        \textbf{Classe} & \textbf{Effectif (Train)} & \textbf{Proportion} & \textbf{Niveau de déséquilibre} \\
+        \midrule
+        Normal & 67\,343 & 53,46\% & Majoritaire \\
+        DoS & 45\,927 & 36,46\% & Majoritaire \\
+        Probe & 11\,656 & 9,25\% & Modéré \\
+        R2L & 995 & 0,79\% & Critique \\
+        U2R & 52 & 0,04\% & \textbf{Extrême} \\
+        \bottomrule
+    \end{tabular}
+    \caption{Distribution des classes dans le jeu d'entraînement NSL-KDD.}
+    \label{tab:desequilibre}
+\end{table}
+
+Le ratio entre la classe majoritaire (Normal : 67\,343 instances) et la classe la plus rare (U2R : 52 instances) est de \textbf{1\,295:1}. Ce déséquilibre pose un problème mathématique fondamental : un classifieur naïf qui prédirait systématiquement la classe \og Normal \fg{} obtiendrait une exactitude apparente de 53,46\%, tout en ayant un rappel de 0\% pour les attaques U2R --- exactement le type d'attaques les plus dangereuses.
+
+\section{Analyse des variables catégorielles}
+
+Le dataset contient trois variables catégorielles non numériques :
+
+\begin{itemize}
+    \item \texttt{protocol\_type} : le protocole de transport utilisé --- TCP, UDP ou ICMP. La grande majorité du trafic utilise TCP.
+    \item \texttt{service} : le service réseau cible de la connexion. On dénombre 70 services distincts dans le jeu d'entraînement, parmi lesquels \texttt{http}, \texttt{smtp}, \texttt{ftp\_data}, \texttt{private}, etc.
+    \item \texttt{flag} : le statut de la connexion TCP (ex : \texttt{SF} pour connexion normale terminée, \texttt{S0} pour tentative sans réponse, \texttt{REJ} pour connexion rejetée). On dénombre 11 valeurs distinctes.
+\end{itemize}
+
+La variable \texttt{flag} est particulièrement discriminante pour la détection d'attaques DoS : un taux anormalement élevé de connexions \texttt{S0} sur un même hôte est souvent le signe d'un scan SYN (\textit{SYN flood}).
+
+\section{Défi de généralisation du jeu de test}
+
+Un aspect critique souvent sous-estimé du NSL-KDD est que le jeu de test contient des \textbf{sous-types d'attaques absents du jeu d'entraînement}. Par exemple, les attaques \texttt{apache2}, \texttt{mailbomb}, \texttt{mscan}, \texttt{saint}, \texttt{httptunnel} et \texttt{sqlattack} n'apparaissent que dans le jeu de test. Cela signifie que les modèles ne peuvent pas les apprendre directement ; ils doivent être capables de \textbf{généraliser} à partir des caractéristiques communes de la catégorie d'attaque correspondante. Ce défi rend les scores sur le jeu de test plus réalistes et moins optimistes que dans d'autres benchmarks.
+
+
+% ═══════════════════════════════════════════
+% CHAPITRE 3 — PRÉTRAITEMENT ET MÉTHODOLOGIE
+% ═══════════════════════════════════════════
+\chapter{Prétraitement et Méthodologie}
+
+\section{Pipeline de prétraitement}
+
+Le prétraitement des données brutes est une étape déterminante dans tout projet de Machine Learning. Un pipeline systématique a été mis en place, composé des étapes suivantes.
+
+\subsection{Mapping des labels d'attaque}
+
+Les 39 sous-types d'attaques originaux ont été mappés vers les 5 classes définies dans la taxonomie (Chapitre 2). Ce mapping a été appliqué de manière identique aux jeux d'entraînement et de test, incluant les sous-types spécifiques au jeu de test pour assurer la couverture complète.
+
+\subsection{Encodage des variables catégorielles}
+
+Les trois variables textuelles (\texttt{protocol\_type}, \texttt{service}, \texttt{flag}) ont été transformées par \textbf{One-Hot Encoding} (encodage binaire disjonctif complet). Cette transformation crée une colonne binaire pour chaque valeur possible de la variable. Ainsi, l'espace de caractéristiques est passé de 41 attributs originaux à \textbf{122 variables numériques}.
+
+Un point technique important : le jeu de test peut contenir des valeurs de \texttt{service} absentes du jeu d'entraînement. Pour y remédier, nous avons utilisé la méthode \texttt{reindex()} de pandas, qui aligne les colonnes du jeu de test sur celles du jeu d'entraînement en remplissant les colonnes manquantes par des zéros.
+
+\subsection{Normalisation par StandardScaler}
+
+Les variables numériques du dataset présentent des échelles très hétérogènes : la variable \texttt{src\_bytes} peut atteindre des millions d'octets, tandis que \texttt{urgent} reste binaire. Sans normalisation, les algorithmes basés sur la distance seraient dominés par les variables à forte variance.
+
+Nous avons appliqué une standardisation \textit{z-score} :
+\begin{equation}
+    x_{\text{norm}} = \frac{x - \mu}{\sigma}
+\end{equation}
+où $\mu$ est la moyenne et $\sigma$ l'écart-type, calculés \textbf{uniquement} sur le jeu d'entraînement. Le \texttt{StandardScaler} est ensuite appliqué au jeu de test via la méthode \texttt{transform()} (sans recalcul des paramètres), évitant ainsi toute fuite de données.
+
+L'objet \textit{scaler} a été sérialisé dans le fichier \texttt{models/scaler.pkl} via la librairie \texttt{joblib}, permettant sa réutilisation identique lors de la phase d'inférence en production.
+
+\section{Gestion du déséquilibre : SMOTE}
+
+\subsection{Principe de SMOTE}
+
+La technique \textbf{SMOTE} (\textit{Synthetic Minority Over-sampling Technique}), proposée par Chawla et al. (2002), est une méthode de sur-échantillonnage qui génère des exemples synthétiques pour les classes minoritaires. Contrairement au simple sur-échantillonnage aléatoire (duplication d'instances existantes), SMOTE crée de \textbf{nouveaux} points de données en interpolant entre des instances existantes de la classe minoritaire.
+
+L'algorithme fonctionne comme suit :
+
+\begin{algorithm}[H]
+\caption{Algorithme SMOTE simplifié}
+\begin{algorithmic}[1]
+\REQUIRE Ensemble d'instances de la classe minoritaire $S_{min}$, nombre de voisins $k$
+\ENSURE Ensemble d'instances synthétiques $S_{synth}$
+\FOR{chaque instance $x_i \in S_{min}$}
+    \STATE Trouver les $k$ plus proches voisins de $x_i$ dans $S_{min}$
+    \STATE Sélectionner aléatoirement un voisin $x_j$ parmi les $k$
+    \STATE Générer un point synthétique : $x_{new} = x_i + \lambda \cdot (x_j - x_i)$
+    \STATE \quad où $\lambda \sim \mathcal{U}(0, 1)$ est un nombre aléatoire uniforme
+    \STATE Ajouter $x_{new}$ à $S_{synth}$
+\ENDFOR
+\RETURN $S_{synth}$
+\end{algorithmic}
+\end{algorithm}
+
+L'avantage de SMOTE par rapport à la simple duplication est qu'il enrichit l'espace décisionnel de la classe minoritaire, permettant aux algorithmes de mieux délimiter les frontières de décision.
+
+\subsection{Prévention de la fuite de données}
+
+Un piège courant dans l'utilisation de SMOTE est de l'appliquer sur \textbf{l'ensemble du dataset} avant la validation croisée. Cette erreur provoque une \textbf{fuite de données} (\textit{Data Leakage}) car les instances synthétiques générées à partir du jeu d'entraînement complet peuvent contenir de l'information provenant d'instances qui seront utilisées comme jeu de validation.
+
+Pour éviter ce problème, nous avons utilisé le \texttt{Pipeline} de la librairie \texttt{imbalanced-learn} :
+
+\begin{lstlisting}[caption={Pipeline SMOTE avec imbalanced-learn.}]
+from imblearn.pipeline import Pipeline as ImbPipeline
+from imblearn.over_sampling import SMOTE
+
+pipeline = ImbPipeline([
+    ('smote', SMOTE(random_state=42)),
+    ('classifier', XGBClassifier(...))
+])
+\end{lstlisting}
+
+Dans cette architecture, SMOTE est appliqué \textbf{à l'intérieur} de chaque pli de la validation croisée : les données synthétiques sont générées uniquement sur le sous-ensemble d'entraînement de chaque itération, garantissant que le sous-ensemble de validation reste pur et non contaminé.
+
+\section{Stratégie d'optimisation des hyperparamètres}
+
+\subsection{Validation croisée stratifiée}
+
+La validation croisée standard (K-Fold) peut produire des plis où certaines classes minoritaires sont totalement absentes. Pour un dataset aussi déséquilibré que NSL-KDD, nous avons utilisé la \textbf{Stratified K-Fold} ($K = 3$), qui garantit que la proportion de chaque classe est préservée dans chaque pli.
+
+\subsection{Recherche aléatoire des hyperparamètres}
+
+Plutôt qu'une recherche exhaustive par grille (\texttt{GridSearchCV}), computationnellement prohibitive, nous avons opté pour la \textbf{RandomizedSearchCV}. Cette méthode échantillonne aléatoirement un nombre fixe de combinaisons d'hyperparamètres ($n\_iter = 5$) dans l'espace de recherche défini, offrant un excellent compromis entre temps de calcul et qualité de l'optimisation.
+
+Le Tableau~\ref{tab:hyperparams} présente les espaces de recherche définis pour chaque algorithme.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{llll}
+        \toprule
+        \textbf{Algorithme} & \textbf{Hyperparamètre} & \textbf{Valeurs explorées} \\
+        \midrule
+        \multirow{4}{*}{Random Forest} & \texttt{n\_estimators} & \{100, 200, 300\} \\
+         & \texttt{max\_depth} & \{15, 25, 35, None\} \\
+         & \texttt{min\_samples\_split} & \{2, 5, 10\} \\
+         & \texttt{min\_samples\_leaf} & \{1, 2, 4\} \\
+        \midrule
+        \multirow{5}{*}{XGBoost} & \texttt{n\_estimators} & \{100, 200, 300\} \\
+         & \texttt{max\_depth} & \{6, 10, 15\} \\
+         & \texttt{learning\_rate} & \{0,01 ; 0,1 ; 0,2\} \\
+         & \texttt{subsample} & \{0,8 ; 1,0\} \\
+         & \texttt{colsample\_bytree} & \{0,8 ; 1,0\} \\
+        \bottomrule
+    \end{tabular}
+    \caption{Espaces de recherche des hyperparamètres.}
+    \label{tab:hyperparams}
+\end{table}
+
+La métrique d'optimisation choisie est le \textbf{F1-Score Macro}, qui accorde un poids égal à chaque classe indépendamment de son effectif. Ce choix est délibéré : l'exactitude (\textit{accuracy}) favoriserait les classes majoritaires, masquant les performances désastreuses sur U2R et R2L.
+
+
+% ═══════════════════════════════════════════
+% CHAPITRE 4 — FONDEMENTS THÉORIQUES
+% ═══════════════════════════════════════════
+\chapter{Fondements Théoriques des Algorithmes}
+
+Ce chapitre présente les bases mathématiques et algorithmiques des deux modèles ensemblistes utilisés dans ce projet.
+
+\section{Les méthodes d'ensemble (\textit{Ensemble Learning})}
+
+Les méthodes d'ensemble reposent sur le principe qu'un groupe de classifieurs faibles (\textit{weak learners}), combinés intelligemment, peut produire un classifieur fort nettement plus performant que chacun des classifieurs individuels. Deux stratégies principales existent :
+
+\begin{itemize}
+    \item \textbf{Le Bagging} (\textit{Bootstrap Aggregating}) : les classifieurs sont entraînés \textbf{indépendamment} sur des sous-ensembles aléatoires du dataset, puis leurs prédictions sont agrégées par vote majoritaire.
+    \item \textbf{Le Boosting} : les classifieurs sont entraînés \textbf{séquentiellement}, chaque nouveau classifieur se concentrant sur les erreurs commises par les précédents.
+\end{itemize}
+
+\section{Random Forest}
+
+\subsection{Principe}
+
+L'algorithme Random Forest, introduit par Breiman (2001), est une extension du Bagging appliquée aux arbres de décision. Il construit un ensemble de $B$ arbres de décision indépendants, chacun entraîné sur un échantillon bootstrap (tirage avec remise) du jeu d'entraînement.
+
+La particularité de Random Forest par rapport au Bagging classique est l'introduction d'une \textbf{sélection aléatoire des caractéristiques} (\textit{feature bagging}) : à chaque nœud de chaque arbre, seul un sous-ensemble aléatoire de $m$ variables (sur les $p$ disponibles) est considéré pour le critère de division. Typiquement, $m = \sqrt{p}$ pour la classification.
+
+\subsection{Critère de division}
+
+Pour la classification, Random Forest utilise l'\textbf{impureté de Gini} comme critère de division :
+\begin{equation}
+    G(t) = 1 - \sum_{k=1}^{K} p_k^2
+\end{equation}
+où $p_k$ est la proportion d'instances de la classe $k$ dans le nœud $t$. Un nœud pur (contenant une seule classe) a un indice de Gini de 0.
+
+\subsection{Prédiction}
+
+La prédiction finale est obtenue par \textbf{vote majoritaire} :
+\begin{equation}
+    \hat{y} = \arg\max_k \sum_{b=1}^{B} \mathbb{1}[h_b(x) = k]
+\end{equation}
+où $h_b(x)$ est la prédiction du $b$-ème arbre pour l'instance $x$.
+
+\section{XGBoost}
+
+\subsection{Principe du Gradient Boosting}
+
+XGBoost (\textit{eXtreme Gradient Boosting}), développé par Chen et Guestrin (2016), est une implémentation optimisée du \textit{Gradient Boosting Decision Trees} (GBDT). Contrairement à Random Forest, les arbres sont construits \textbf{séquentiellement} : chaque nouvel arbre est entraîné pour minimiser le résidu (l'erreur) laissé par l'ensemble des arbres précédents.
+
+\subsection{Fonction objectif}
+
+À l'itération $t$, la fonction objectif de XGBoost est :
+\begin{equation}
+    \mathcal{L}^{(t)} = \sum_{i=1}^{n} l(y_i, \hat{y}_i^{(t-1)} + f_t(x_i)) + \Omega(f_t)
+\end{equation}
+où $l$ est la fonction de perte (log-loss pour la classification multiclasse), $f_t$ est le nouvel arbre ajouté, et $\Omega(f_t)$ est un terme de régularisation qui pénalise la complexité de l'arbre :
+\begin{equation}
+    \Omega(f) = \gamma T + \frac{1}{2}\lambda \sum_{j=1}^{T} w_j^2
+\end{equation}
+avec $T$ le nombre de feuilles, $w_j$ le poids de la feuille $j$, $\gamma$ et $\lambda$ des paramètres de régularisation.
+
+\subsection{Avantages de XGBoost}
+
+XGBoost intègre plusieurs innovations par rapport au Gradient Boosting classique :
+\begin{itemize}
+    \item \textbf{Régularisation L1 et L2} : réduction du surapprentissage.
+    \item \textbf{Sous-échantillonnage} (\texttt{subsample}, \texttt{colsample\_bytree}) : similaire au feature bagging de Random Forest, ajoutant de la diversité.
+    \item \textbf{Traitement natif des valeurs manquantes} : l'algorithme apprend automatiquement la direction optimale pour les données manquantes.
+    \item \textbf{Parallélisation} : bien que les arbres soient séquentiels, la construction de chaque arbre est parallélisée au niveau des nœuds.
+\end{itemize}
+
+\subsection{Classification multiclasse}
+
+Pour notre problème à 5 classes, XGBoost utilise la stratégie \textbf{One-vs-All} avec la fonction objectif \texttt{multi:softprob}. Le modèle apprend 5 fonctions de score simultanément, et la probabilité de chaque classe est obtenue par la fonction softmax :
+\begin{equation}
+    P(y = k | x) = \frac{e^{f_k(x)}}{\sum_{j=1}^{5} e^{f_j(x)}}
+\end{equation}
+
+\section{Comparaison théorique}
+
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\textwidth}{lXX}
+        \toprule
+        \textbf{Critère} & \textbf{Random Forest} & \textbf{XGBoost} \\
+        \midrule
+        Stratégie d'ensemble & Bagging (parallèle) & Boosting (séquentiel) \\
+        Sensibilité au surapprentissage & Faible & Modérée (régularisation intégrée) \\
+        Temps d'entraînement & Rapide (parallélisable) & Plus lent (séquentiel) \\
+        Performance sur données tabulaires & Très bonne & Souvent supérieure \\
+        Interprétabilité & Bonne (importance des features) & Bonne (importance des features) \\
+        \bottomrule
+    \end{tabularx}
+    \caption{Comparaison théorique entre Random Forest et XGBoost.}
+    \label{tab:comparaison-theorique}
+\end{table}
+
+
+% ═══════════════════════════════════════════
+% CHAPITRE 5 — RÉSULTATS
+% ═══════════════════════════════════════════
+\chapter{Résultats Expérimentaux et Analyse}
+
+Ce chapitre présente les résultats obtenus par les deux modèles optimisés sur le jeu de test NSL-KDD, suivis d'une analyse approfondie.
+
+\section{Métriques d'évaluation utilisées}
+
+Pour un problème de classification multiclasse déséquilibrée, il est fondamental de choisir des métriques adaptées. Les métriques utilisées dans ce projet sont :
+
+\begin{itemize}
+    \item \textbf{Exactitude (Accuracy)} : proportion de prédictions correctes sur l'ensemble du jeu de test. Métrique globale, mais trompeuse en cas de déséquilibre.
+    
+    \item \textbf{Précision (Precision)} : pour une classe $k$, la proportion de prédictions $k$ qui sont effectivement de classe $k$ :
+    \begin{equation}
+        \text{Precision}_k = \frac{VP_k}{VP_k + FP_k}
+    \end{equation}
+    
+    \item \textbf{Rappel (Recall)} : pour une classe $k$, la proportion d'instances réellement de classe $k$ qui ont été correctement identifiées :
+    \begin{equation}
+        \text{Recall}_k = \frac{VP_k}{VP_k + FN_k}
+    \end{equation}
+    
+    \item \textbf{F1-Score} : moyenne harmonique de la précision et du rappel :
+    \begin{equation}
+        F1_k = 2 \cdot \frac{\text{Precision}_k \times \text{Recall}_k}{\text{Precision}_k + \text{Recall}_k}
+    \end{equation}
+    
+    \item \textbf{F1-Score Macro} : moyenne non pondérée des F1-Scores de toutes les classes, accordant un poids égal à chaque classe :
+    \begin{equation}
+        F1_{\text{macro}} = \frac{1}{K} \sum_{k=1}^{K} F1_k
+    \end{equation}
+    
+    \item \textbf{Courbe ROC et AUC} : la courbe ROC (\textit{Receiver Operating Characteristic}) trace le taux de vrais positifs en fonction du taux de faux positifs à différents seuils de décision. L'aire sous la courbe (AUC) résume la capacité discriminante du modèle (1,0 = parfait, 0,5 = aléatoire).
+\end{itemize}
+
+\section{Résultats globaux}
+
+Le Tableau~\ref{tab:resultats-globaux} présente les performances globales des deux modèles optimisés, évalués sur le jeu de test NSL-KDD.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{lccc}
+        \toprule
+        \textbf{Métrique} & \textbf{Random Forest + SMOTE} & \textbf{XGBoost + SMOTE} & \textbf{$\Delta$} \\
+        \midrule
+        Exactitude globale & 75,00\% & \textbf{78,95\%} & +3,95\% \\
+        F1-Score Macro & 0,5342 & \textbf{0,6314} & +0,0972 \\
+        F1-Score Pondéré & 0,7087 & \textbf{0,7582} & +0,0495 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Comparaison des scores globaux sur le jeu de test NSL-KDD.}
+    \label{tab:resultats-globaux}
+\end{table}
+
+XGBoost surpasse Random Forest sur les trois métriques, avec un gain de \textbf{+9,72 points} sur le F1-Score Macro, la métrique la plus pertinente pour notre problème déséquilibré.
+
+\section{Analyse détaillée par classe}
+
+Le Tableau~\ref{tab:resultats-classe} détaille les performances de chaque modèle pour chacune des cinq classes.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{l|ccc|ccc}
+        \toprule
+        & \multicolumn{3}{c|}{\textbf{Random Forest + SMOTE}} & \multicolumn{3}{c}{\textbf{XGBoost + SMOTE}} \\
+        \textbf{Classe} & Précision & Rappel & F1 & Précision & Rappel & F1 \\
+        \midrule
+        Normal & 0,6675 & 0,9667 & 0,7895 & 0,7236 & 0,9448 & 0,8196 \\
+        DoS & 0,9543 & 0,6990 & 0,8071 & 0,9657 & 0,7704 & 0,8572 \\
+        Probe & 0,7707 & 0,5753 & 0,6589 & 0,7449 & 0,7124 & 0,7283 \\
+        R2L & 0,8333 & 0,2153 & 0,3423 & 0,9711 & 0,3153 & 0,4759 \\
+        U2R & 0,1818 & 0,1463 & 0,1621 & 0,7188 & 0,3415 & 0,4630 \\
+        \bottomrule
+    \end{tabular}
+    \caption{Performances détaillées par classe (Précision, Rappel, F1-Score).}
+    \label{tab:resultats-classe}
+\end{table}
+
+\subsection{Observations clés}
+
+\begin{enumerate}
+    \item \textbf{Classe Normal} : Les deux modèles détectent très bien le trafic légitime (rappel $> 94\%$), mais XGBoost est plus précis (72,36\% vs 66,75\%), réduisant les faux positifs.
+    
+    \item \textbf{Classe DoS} : Les attaques par déni de service sont détectées avec une précision quasi parfaite (\textbf{96,57\%} pour XGBoost). Le rappel plus faible (77,04\%) s'explique par les sous-types de DoS du jeu de test absents de l'entraînement.
+    
+    \item \textbf{Classe Probe} : XGBoost montre un gain significatif en rappel (71,24\% vs 57,53\%), suggérant une meilleure capacité à généraliser les motifs de reconnaissance réseau.
+    
+    \item \textbf{Classe R2L} : C'est ici que XGBoost excelle particulièrement, avec une précision de \textbf{97,11\%}. Lorsque le modèle prédit une attaque R2L, il a raison dans 97\% des cas. Le rappel reste modeste (31,53\%) en raison de la grande diversité des sous-types R2L.
+    
+    \item \textbf{Classe U2R} : Le résultat le plus remarquable du projet. Grâce au pipeline SMOTE, le F1-Score de la classe U2R est passé de 0,1621 (RF) à \textbf{0,4630} (XGBoost), soit un triplement des performances. Avec seulement 52 exemples d'entraînement, atteindre une précision de 71,88\% est un résultat significatif.
+\end{enumerate}
+
+\section{Analyse des matrices de confusion}
+
+Les matrices de confusion permettent de visualiser les erreurs de classification les plus fréquentes. La Figure~\ref{fig:confusion} compare les matrices des deux modèles.
+
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{reports/model_comparison_optimized.png}
-    \caption{Comparaison détaillée par classe (F1-Score, Précision, Rappel) entre Random Forest et XGBoost.}
-    \label{fig:comparison}
-\end{figure}
-
-Comme l'illustre la figure \ref{fig:comparison}, XGBoost surpasse systématiquement Random Forest, particulièrement sur la capacité de rappel (Recall) des classes critiques.
-
-\section{Analyse des Matrices de Confusion}
-Le F1-Score Macro met en exergue la supériorité d'XGBoost. La figure \ref{fig:confusion} montre les détails des prédictions.
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{reports/confusion_matrices_optimized.png}
-    \caption{Matrices de confusion de Random Forest et XGBoost sur le jeu de test NSL-KDD.}
+    \includegraphics[width=\textwidth]{../reports/confusion_matrices_optimized.png}
+    \caption{Matrices de confusion de Random Forest (gauche) et XGBoost (droite) sur le jeu de test.}
     \label{fig:confusion}
 \end{figure}
 
-Grâce au pipeline SMOTE, la classe \textbf{U2R} a vu son F1-Score passer d'une valeur marginale à \textbf{0.46}, avec une précision de 71.88\%. Les attaques \textbf{R2L} affichent quant à elles une précision de \textbf{97.11\%}. Les algorithmes ont donc appris la sémantique de l'attaque plutôt que de simplement mémoriser les labels majoritaires.
+L'analyse de la matrice d'XGBoost révèle les principaux motifs d'erreur :
+\begin{itemize}
+    \item Les attaques \textbf{R2L} sont principalement confondues avec le trafic \textbf{Normal}. Cela est cohérent avec la nature même de ces attaques, qui imitent un comportement réseau légitime tout en exploitant subtilement des vulnérabilités.
+    \item Les attaques \textbf{Probe} sont parfois classifiées comme \textbf{Normal}, ce qui s'explique par le fait que certaines reconnaissances réseau sont très discrètes.
+    \item Le modèle confond rarement les classes entre elles (faibles valeurs hors diagonale pour DoS, Probe, U2R), ce qui est un signe de bonne discrimination.
+\end{itemize}
 
-\section{Courbes ROC et Importance des Caractéristiques}
-Pour évaluer la capacité des modèles à distinguer parfaitement chaque classe des autres, l'analyse des courbes ROC (Receiver Operating Characteristic) est primordiale (Figure \ref{fig:roc}).
+\section{Analyse des courbes ROC}
+
+Les courbes ROC (\textit{Receiver Operating Characteristic}) évaluent la capacité de discrimination binaire du modèle pour chaque classe (approche One-vs-Rest). La Figure~\ref{fig:roc} présente les résultats.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{reports/roc_curves_optimized.png}
-    \caption{Courbes ROC (One-vs-Rest) pour les deux modèles avec l'aire sous la courbe (AUC) par classe.}
+    \includegraphics[width=\textwidth]{../reports/roc_curves_optimized.png}
+    \caption{Courbes ROC (One-vs-Rest) avec aire sous la courbe (AUC) par classe.}
     \label{fig:roc}
 \end{figure}
 
-Les modèles s'appuient sur un sous-ensemble de variables très discriminantes. La figure \ref{fig:importance} présente les caractéristiques qui contribuent le plus aux décisions de l'algorithme, telles que les taux d'erreurs TCP (\texttt{dst\_host\_srv\_serror\_rate}) ou l'identification du protocole ICMP.
+Les valeurs d'AUC confirment la hiérarchie des difficultés de classification : les classes DoS et Normal atteignent des AUC proches de 0,99, tandis que les classes R2L et U2R présentent des AUC plus modestes mais significativement supérieures au seuil aléatoire de 0,5.
+
+\section{Importance des caractéristiques}
+
+L'analyse de l'importance des caractéristiques (\textit{feature importance}) permet de comprendre quelles variables le modèle utilise le plus pour ses décisions. La Figure~\ref{fig:importance} compare les Top 20 des deux modèles.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth]{reports/feature_importance_optimized.png}
-    \caption{Top 20 des caractéristiques (Features) les plus importantes selon chaque modèle.}
+    \includegraphics[width=\textwidth]{../reports/feature_importance_optimized.png}
+    \caption{Top 20 des caractéristiques les plus importantes pour Random Forest et XGBoost.}
     \label{fig:importance}
 \end{figure}
 
-\section{L'Inspiration Morpheus : Benchmark de Latence}
-Puisque le but ultime est une détection temps réel sur un trafic réseau à haute vélocité (concept central de NVIDIA Morpheus), nous avons mesuré la latence d'inférence brute du modèle XGBoost final :
+Les variables les plus discriminantes incluent :
 \begin{itemize}
-    \item Batch unitaire (1 connexion) : $\sim 7$ ms
-    \item Batch intermédiaire (1 000 connexions) : $\sim 28$ ms
-    \item Grand Batch (10 000 connexions) : $\sim 218$ ms
+    \item \texttt{dst\_host\_srv\_serror\_rate} et \texttt{serror\_rate} : taux d'erreurs SYN, indicateurs forts d'attaques DoS de type \textit{SYN flood}.
+    \item \texttt{service\_http} et \texttt{service\_private} : le type de service cible, discriminant pour les attaques R2L.
+    \item \texttt{src\_bytes} et \texttt{dst\_bytes} : le volume de données transféré, anormalement élevé ou faible selon le type d'attaque.
+    \item \texttt{logged\_in} : indicateur de session authentifiée, pertinent pour distinguer les tentatives d'intrusion des connexions légitimes.
 \end{itemize}
-Ces métriques valident que le système est capable de traiter plus de 45 000 paquets par seconde sur une architecture standard, évitant ainsi le risque d'engorgement du réseau lié à la sécurité.
 
-% ---------------------------------------------------------
-% CHAPITRE 5
-% ---------------------------------------------------------
-\chapter{MLOps et Industrialisation}
+\section{Comparaison visuelle des performances}
 
-Un modèle performant dans un notebook Jupyter n'a pas de valeur métier tant qu'il n'est pas déployable. Nous avons donc adopté une approche d'ingénierie logicielle (MLOps) rigoureuse.
+La Figure~\ref{fig:comparison} offre une vue comparative synthétique des trois métriques principales (F1-Score, Précision, Rappel) pour chaque classe.
 
-\section{Architecture Backend (FastAPI)}
-L'API a été développée avec le framework asynchrone \textbf{FastAPI}. 
-L'état de l'application (chargement du \textit{scaler}, du modèle XGBoost, et des noms de colonnes) est géré de façon moderne via un \texttt{lifespan async context manager}. Cela garantit que les artefacts binaires lourds ne sont chargés en RAM qu'une seule fois au démarrage du serveur.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{../reports/model_comparison_optimized.png}
+    \caption{Comparaison détaillée RF vs XGBoost par classe : F1-Score, Précision et Rappel.}
+    \label{fig:comparison}
+\end{figure}
 
-\section{Interface Utilisateur (Dashboard)}
-Une interface web légère a été développée en HTML/JS vanilla pour simuler le tableau de bord d'un centre d'opérations de sécurité (SOC). Le Dashboard interroge l'API à intervalles réguliers (simulant un flux de données) et affiche des métriques dynamiques et des alertes visuelles interactives basées sur les prédictions du modèle en direct.
+Cette visualisation confirme que XGBoost surpasse Random Forest de manière systématique sur toutes les classes, avec un avantage particulièrement marqué sur les classes critiques R2L et U2R.
 
-\section{Conteneurisation (Docker)}
-Pour assurer la portabilité de l'IDS, l'environnement a été défini au sein d'un \texttt{Dockerfile} basé sur une image Python légère. L'outil \texttt{docker-compose} permet d'orchestrer l'ensemble de l'application avec une simple commande, garantissant que l'infrastructure s'exécute de manière identique en développement comme en production.
+\section{Benchmark de latence}
 
-% ---------------------------------------------------------
-% CHAPITRE 6
-% ---------------------------------------------------------
+Dans la perspective d'un déploiement en temps réel, nous avons mesuré la latence d'inférence brute du modèle XGBoost final sur des batchs de tailles croissantes.
+
+\begin{table}[H]
+    \centering
+    \begin{tabular}{lcc}
+        \toprule
+        \textbf{Taille du batch} & \textbf{Latence mesurée} & \textbf{Débit estimé} \\
+        \midrule
+        1 connexion & $\sim 7$ ms & $\sim 143$ conn/s \\
+        1\,000 connexions & $\sim 28$ ms & $\sim 35\,714$ conn/s \\
+        10\,000 connexions & $\sim 218$ ms & $\sim 45\,872$ conn/s \\
+        \bottomrule
+    \end{tabular}
+    \caption{Benchmark de latence d'inférence du modèle XGBoost.}
+    \label{tab:benchmark}
+\end{table}
+
+Le modèle est capable de classer plus de \textbf{45\,000 connexions par seconde} en mode batch sur un processeur standard, ce qui valide la faisabilité d'une utilisation en temps réel.
+
+
+% ═══════════════════════════════════════════
+% CHAPITRE 6 — DÉPLOIEMENT
+% ═══════════════════════════════════════════
+\chapter{Industrialisation et Déploiement}
+
+Un modèle performant dans un notebook Jupyter n'a pas de valeur opérationnelle tant qu'il n'est pas déployable. Ce chapitre détaille l'architecture logicielle mise en place pour transformer le modèle en un produit exploitable.
+
+\section{Architecture globale}
+
+L'architecture du système suit le paradigme des \textbf{microservices}, séparant le backend d'inférence du frontend de visualisation. La Figure~\ref{fig:architecture} illustre les composants principaux.
+
+\begin{figure}[H]
+    \centering
+    \fbox{\parbox{0.9\textwidth}{
+        \centering
+        \textbf{Architecture du système IDS}\\[0.5cm]
+        \begin{tabular}{ccc}
+            \fbox{\textbf{Dashboard HTML/JS}} & $\xleftarrow{\text{HTTP REST}}$ & \fbox{\textbf{API FastAPI (Python)}} \\
+            \textit{Port 8080 (Nginx)} & & \textit{Port 8000 (Uvicorn)} \\
+            & & $\downarrow$ \\
+            & & \fbox{\textbf{Modèle XGBoost (.pkl)}} \\
+            & & \fbox{\textbf{Scaler (.pkl)}} \\
+            & & \fbox{\textbf{Dataset Test (.txt)}} \\
+        \end{tabular}
+    }}
+    \caption{Architecture microservices du système IDS.}
+    \label{fig:architecture}
+\end{figure}
+
+\section{Backend : API FastAPI}
+
+\subsection{Choix technologique}
+
+Le framework \textbf{FastAPI} a été choisi pour les raisons suivantes :
+\begin{itemize}
+    \item \textbf{Performance} : construit sur Starlette et Uvicorn (serveur ASGI), il offre des performances comparables à Node.js et Go.
+    \item \textbf{Documentation automatique} : génération automatique d'une interface Swagger/OpenAPI sur \texttt{/docs}.
+    \item \textbf{Validation des données} : intégration native avec Pydantic pour la validation et la sérialisation des schémas de requête.
+    \item \textbf{Support asynchrone} : gestion native des requêtes asynchrones via \texttt{async/await}.
+\end{itemize}
+
+\subsection{Endpoints de l'API}
+
+L'API expose trois endpoints principaux :
+
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\textwidth}{llX}
+        \toprule
+        \textbf{Méthode} & \textbf{Route} & \textbf{Description} \\
+        \midrule
+        \texttt{GET} & \texttt{/} & Vérification de santé de l'API. Retourne le statut et le modèle chargé. \\
+        \texttt{POST} & \texttt{/predict} & Inférence sur une connexion personnalisée. Accepte un JSON avec les 41 attributs et retourne la classe prédite, la confiance et la latence. \\
+        \texttt{GET} & \texttt{/predict/random} & Simulation de flux. Sélectionne aléatoirement une connexion du jeu de test, effectue la prédiction et retourne le résultat avec le vrai label. \\
+        \bottomrule
+    \end{tabularx}
+    \caption{Endpoints de l'API REST.}
+    \label{tab:endpoints}
+\end{table}
+
+\subsection{Gestion du cycle de vie}
+
+Le chargement des artefacts lourds (modèle, scaler, données de test) est effectué une seule fois au démarrage du serveur via un \texttt{lifespan async context manager}. Cette approche garantit que :
+\begin{itemize}
+    \item Les fichiers \texttt{.pkl} ne sont lus qu'une fois, réduisant la latence de chaque requête.
+    \item Le jeu de test est pré-transformé (One-Hot Encoding + StandardScaler) et stocké en mémoire sous forme de tableau NumPy, permettant des prédictions instantanées.
+\end{itemize}
+
+\section{Frontend : Tableau de bord interactif}
+
+Le tableau de bord a été développé en HTML/CSS/JavaScript vanilla (sans framework), simulant l'interface d'un centre d'opérations de sécurité (SOC). Il offre les fonctionnalités suivantes :
+
+\begin{itemize}
+    \item \textbf{Métriques en temps réel} : compteurs animés pour le nombre de paquets analysés, les menaces détectées, le taux de précision et la latence moyenne.
+    \item \textbf{Flux réseau en direct} : un terminal de monitoring qui affiche les connexions analysées avec leur prédiction, le niveau de confiance et le statut correct/erreur.
+    \item \textbf{Jauge de menace} : un indicateur visuel qui s'adapte dynamiquement au ratio d'attaques détectées.
+    \item \textbf{Répartition par classe} : des barres de progression montrant la distribution en temps réel des types d'attaques.
+    \item \textbf{Mode clair/sombre} : un toggle permettant de basculer entre les deux thèmes, avec persistance via \texttt{localStorage}.
+\end{itemize}
+
+\section{Conteneurisation Docker}
+
+L'application est entièrement conteneurisée pour garantir sa portabilité et sa reproductibilité.
+
+\subsection{Dockerfile}
+
+L'image Docker de l'API est construite à partir de \texttt{python:3.11-slim}, une image légère qui minimise la surface d'attaque. Le Dockerfile suit les bonnes pratiques :
+\begin{itemize}
+    \item Copie des dépendances (\texttt{requirements.txt}) en premier pour exploiter le cache Docker.
+    \item Copie sélective des fichiers nécessaires uniquement (code API, modèle, scaler, données de test).
+    \item Exposition du port 8000 et lancement via Uvicorn.
+\end{itemize}
+
+\subsection{Docker Compose}
+
+Le fichier \texttt{docker-compose.yml} orchestre deux services :
+\begin{enumerate}
+    \item \textbf{api} : le conteneur Python FastAPI sur le port 8000, avec un \textit{healthcheck} automatique.
+    \item \textbf{dashboard} : un conteneur Nginx Alpine servant le fichier HTML statique sur le port 8080, avec montage en volume des fichiers du frontend.
+\end{enumerate}
+
+Le lancement de l'ensemble de l'application se fait en une seule commande :
+\begin{lstlisting}[language=bash, numbers=none]
+docker-compose up -d --build
+\end{lstlisting}
+
+
+% ═══════════════════════════════════════════
+% CHAPITRE 7 — CONCLUSION
+% ═══════════════════════════════════════════
 \chapter{Conclusion et Perspectives}
 
-Ce projet a prouvé la faisabilité et la pertinence du Machine Learning pour sécuriser les réseaux modernes. Face au défi majeur que représente le déséquilibre du dataset NSL-KDD, l'utilisation couplée de l'oversampling via SMOTE et de l'algorithme XGBoost a permis des gains significatifs sur les attaques furtives critiques (U2R et R2L). Le cycle de vie complet du projet a été respecté : de la fouille de données à la livraison d'un microservice (API) réactif et conteneurisé.
+\section{Synthèse des contributions}
 
-\section*{Perspectives d'amélioration}
-Bien que le benchmark de latence soit très satisfaisant, l'architecture actuelle effectue une inférence de type \textit{stateless} (requête HTTP synchrone pour chaque évaluation de trafic).
-Pour une implémentation \textit{Entreprise} pouvant soutenir le débit des grands datacenters (objectif visé par le framework NVIDIA Morpheus), plusieurs améliorations architecturales sont envisageables :
+Ce projet de fin de module a permis de développer un système de détection d'intrusions réseau complet, couvrant l'intégralité du cycle de vie d'un projet de Machine Learning :
+
 \begin{enumerate}
-    \item \textbf{Ingestion Asynchrone} : Remplacer l'API REST par un bus d'événements comme \textbf{Apache Kafka} pour avaler des millions de logs réseau en temps réel sans blocage.
-    \item \textbf{Serving sur GPU} : Déléguer l'inférence du modèle à \textbf{Triton Inference Server} pour bénéficier de la parallélisation massive des cartes graphiques (GPU).
-    \item \textbf{Déploiement Distribué} : Migrer la gestion des conteneurs vers un cluster Kubernetes afin d'assurer l'auto-scaling de l'application face aux pics d'attaques (DDoS).
+    \item \textbf{Analyse et prétraitement} : exploration du dataset NSL-KDD, encodage des variables catégorielles, normalisation, et mapping des 39 sous-types d'attaques vers 5 classes.
+    
+    \item \textbf{Gestion du déséquilibre} : implémentation rigoureuse de SMOTE dans un pipeline \texttt{imbalanced-learn} empêchant toute fuite de données, un aspect technique souvent négligé dans la littérature.
+    
+    \item \textbf{Modélisation} : comparaison systématique de Random Forest et XGBoost avec optimisation des hyperparamètres par \texttt{RandomizedSearchCV} et validation croisée stratifiée à 3 plis.
+    
+    \item \textbf{Résultats} : le modèle XGBoost atteint 78,95\% d'exactitude et un F1-Score Macro de 0,631. Le résultat le plus significatif est l'amélioration drastique de la détection des attaques rares : F1 de 0,46 pour U2R et précision de 97,11\% pour R2L.
+    
+    \item \textbf{Déploiement} : industrialisation complète via une API FastAPI, un tableau de bord interactif et une conteneurisation Docker, avec une capacité de traitement de plus de 45\,000 connexions par seconde.
+\end{enumerate}
+
+\section{Limites du projet}
+
+Malgré les résultats encourageants, plusieurs limites méritent d'être soulignées :
+
+\begin{itemize}
+    \item \textbf{Dataset daté} : le NSL-KDD, bien que référence académique, date de 2009 et ne reflète pas les attaques modernes (ransomwares, attaques par supply chain, etc.).
+    
+    \item \textbf{Rappel des classes rares} : le rappel des classes R2L (31,53\%) et U2R (34,15\%) reste insuffisant pour un déploiement en production. De nombreuses attaques de ces types passent encore inaperçues.
+    
+    \item \textbf{Nombre de modèles comparés} : seuls deux algorithmes ont été évalués. L'ajout d'un modèle baseline (Régression Logistique) et de modèles plus avancés (LightGBM, réseaux de neurones) aurait renforcé la rigueur comparative.
+    
+    \item \textbf{Absence de sélection de caractéristiques} : les 122 variables post-encodage ont toutes été utilisées sans analyse de leur pertinence individuelle.
+\end{itemize}
+
+\section{Perspectives d'amélioration}
+
+Plusieurs pistes d'amélioration sont envisageables pour des travaux futurs :
+
+\begin{enumerate}
+    \item \textbf{Datasets modernes} : remplacer NSL-KDD par des datasets plus récents comme CICIDS2017 ou CSE-CIC-IDS2018, qui contiennent des types d'attaques contemporains.
+    
+    \item \textbf{Sélection de caractéristiques} : appliquer des techniques comme \textit{Recursive Feature Elimination} (RFE) ou \texttt{SelectKBest} pour réduire la dimensionnalité et potentiellement améliorer les performances.
+    
+    \item \textbf{Deep Learning} : explorer les architectures de réseaux de neurones profonds (MLP, autoencodeurs, LSTM pour les séquences temporelles) qui pourraient capturer des motifs plus complexes.
+    
+    \item \textbf{Techniques avancées de rééquilibrage} : combiner SMOTE avec un sous-échantillonnage de la classe majoritaire (SMOTE+Tomek Links, SMOTE+ENN) pour affiner les frontières de décision.
+    
+    \item \textbf{Architecture de streaming} : remplacer l'API REST par un bus d'événements comme Apache Kafka pour ingérer et analyser des millions de paquets réseau en continu.
+    
+    \item \textbf{Inférence sur GPU} : déployer le modèle via NVIDIA Triton Inference Server pour bénéficier de la parallélisation massive des cartes graphiques, conformément à l'architecture du framework Morpheus.
+    
+    \item \textbf{Orchestration Kubernetes} : migrer la gestion des conteneurs vers un cluster Kubernetes pour l'auto-scaling face aux pics de trafic.
+\end{enumerate}
+
+\section{Bilan personnel}
+
+Ce projet a été l'occasion de mettre en pratique l'ensemble des compétences acquises durant le module de Machine Learning : de l'exploration des données à la mise en production d'un modèle, en passant par la gestion des défis techniques réels comme le déséquilibre des classes et la prévention des fuites de données. L'approche de bout en bout adoptée reflète la réalité du métier de \textit{Machine Learning Engineer}, où la modélisation ne représente qu'une fraction du travail global.
+
+% ═══════════════════════════════════════════
+% BIBLIOGRAPHIE
+% ═══════════════════════════════════════════
+\chapter*{Références Bibliographiques}
+\addcontentsline{toc}{chapter}{Références Bibliographiques}
+
+\begin{enumerate}[label={[\arabic*]}]
+    \item M. Tavallaee, E. Bagheri, W. Lu, et A. A. Ghorbani, \textit{A Detailed Analysis of the KDD CUP 99 Data Set}, IEEE Symposium on Computational Intelligence for Security and Defense Applications, 2009.
+    
+    \item N. V. Chawla, K. W. Bowyer, L. O. Hall, et W. P. Kegelmeyer, \textit{SMOTE: Synthetic Minority Over-sampling Technique}, Journal of Artificial Intelligence Research, vol. 16, pp. 321--357, 2002.
+    
+    \item T. Chen et C. Guestrin, \textit{XGBoost: A Scalable Tree Boosting System}, Proceedings of the 22nd ACM SIGKDD International Conference on Knowledge Discovery and Data Mining, pp. 785--794, 2016.
+    
+    \item L. Breiman, \textit{Random Forests}, Machine Learning, vol. 45, no. 1, pp. 5--32, 2001.
+    
+    \item J. H. Friedman, \textit{Greedy Function Approximation: A Gradient Boosting Machine}, Annals of Statistics, vol. 29, no. 5, pp. 1189--1232, 2001.
+    
+    \item F. Pedregosa et al., \textit{Scikit-learn: Machine Learning in Python}, Journal of Machine Learning Research, vol. 12, pp. 2825--2830, 2011.
+    
+    \item G. Lemaître, F. Nogueira, et C. K. Aridas, \textit{Imbalanced-learn: A Python Toolbox to Tackle the Curse of Imbalanced Datasets in Machine Learning}, Journal of Machine Learning Research, vol. 18, no. 17, pp. 1--5, 2017.
+    
+    \item NVIDIA, \textit{Morpheus AI Framework for Cybersecurity}, Documentation officielle, \url{https://developer.nvidia.com/morpheus-cybersecurity}, 2023.
+    
+    \item S. Ramírez-Gallego, B. Krawczyk, S. García, M. Wozniak, et F. Herrera, \textit{A Survey on Data Preprocessing for Data Stream Mining}, Neurocomputing, vol. 239, pp. 39--57, 2017.
+    
+    \item A. L. Buczak et E. Guven, \textit{A Survey of Data Mining and Machine Learning Methods for Cyber Security Intrusion Detection}, IEEE Communications Surveys \& Tutorials, vol. 18, no. 2, pp. 1153--1176, 2016.
 \end{enumerate}
 
 \end{document}
