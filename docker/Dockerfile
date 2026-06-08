@@ -13,7 +13,7 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copie des fichiers vitaux pour l'API (Code, Modèles, Scaler)
-# PRE-REQUIS : Run `python src/prepare_data.py` then `python src/train_model.py`
+# PRE-REQUIS : Run `notebooks/prepare_data.ipynb` then `notebooks/train_model.ipynb`
 # Generated files: models/best_model.pkl, models/scaler.pkl, models/model_columns.pkl
 COPY api/api.py .
 COPY models/best_model.pkl models/

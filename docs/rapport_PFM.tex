@@ -419,7 +419,7 @@ La Figure~\ref{fig:comparison} offre une comparaison directe du F1-Score, de la 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\textwidth, height=9cm, keepaspectratio]{../reports/model_comparison_optimized.png}
+    \includegraphics[width=\textwidth, height=9cm, keepaspectratio]{../reports/model_comparison.png}
     \caption{Comparaison RF vs XGBoost par classe : F1-Score, Précision et Rappel.}
     \label{fig:comparison}
 \end{figure}
@@ -432,7 +432,7 @@ L'analyse des matrices de confusion (Figure~\ref{fig:confusion}) met en lumière
 
 \begin{figure}[p]
     \centering
-    \includegraphics[width=\textwidth]{../reports/confusion_matrices_optimized.png}
+    \includegraphics[width=\textwidth]{../reports/confusion_matrices.png}
     \caption{Matrices de confusion de Random Forest (gauche) et XGBoost (droite) sur le jeu de test NSL-KDD. Les valeurs en diagonale représentent les prédictions correctes.}
     \label{fig:confusion}
 \end{figure}
@@ -450,7 +450,7 @@ Les courbes ROC (\textit{Receiver Operating Characteristic}) évaluent la capaci
 
 \begin{figure}[p]
     \centering
-    \includegraphics[width=\textwidth]{../reports/roc_curves_optimized.png}
+    \includegraphics[width=\textwidth]{../reports/roc_curves.png}
     \caption{Courbes ROC (One-vs-Rest) avec aire sous la courbe (AUC) par classe pour Random Forest (gauche) et XGBoost (droite).}
     \label{fig:roc}
 \end{figure}
@@ -463,7 +463,7 @@ La Figure~\ref{fig:importance} présente les "Top 20 Features" les plus discrimi
 
 \begin{figure}[p]
     \centering
-    \includegraphics[width=\textwidth]{../reports/feature_importance_optimized.png}
+    \includegraphics[width=\textwidth]{../reports/feature_importance.png}
     \caption{Top 20 des caractéristiques les plus importantes pour Random Forest (gauche) et XGBoost (droite).}
     \label{fig:importance}
 \end{figure}
@@ -537,7 +537,7 @@ Le modèle entraîné (sérialisé via \texttt{joblib}) est exposé via une API 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global model, scaler, model_columns
-    model = joblib.load('models/best_model_cv.pkl')
+    model = joblib.load('models/best_model.pkl')
     scaler = joblib.load('models/scaler.pkl')
     model_columns = joblib.load('models/model_columns.pkl')
     # Pre-transform du jeu de test en memoire
