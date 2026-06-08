@@ -157,7 +157,10 @@
             font-family: var(--font-display); font-weight: 800; font-size: 1.6rem; letter-spacing: 3px;
             background: linear-gradient(90deg, var(--cyan), var(--purple), var(--cyan));
             background-size: 200% auto;
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            color: transparent;
             animation: shimmer 4s linear infinite;
         }
         @keyframes shimmer { 0% { background-position: 0% center; } 100% { background-position: 200% center; } }
