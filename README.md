@@ -42,8 +42,11 @@ Attack-Detector-Model/
 ├── src/
 │   ├── run_advanced_models.py  # Code d'entraînement optimisé (XGBoost + SMOTE)
 │   └── run_models.py           # Ancienne version (Random Forest)
-├── Dockerfile                  # Configuration de l'image de l'API
-├── docker-compose.yml          # Orchestration des microservices
+├── docker/
+│   ├── Dockerfile              # Configuration de l'image de l'API
+│   └── docker-compose.yml      # Orchestration des microservices
+├── docs/
+│   └── rapport_PFM.tex         # Rapport complet du projet
 ├── requirements.txt            # Dépendances Python
 └── README.md
 ```
@@ -131,7 +134,7 @@ Cette commande génère `models/best_model_cv.pkl`, `models/scaler.pkl`, et `mod
 ### Option A : Déploiement Docker (Recommandé / MLOps)
 Le projet est entièrement conteneurisé. L'API et le Dashboard tournent dans des conteneurs séparés.
 ```bash
-docker-compose up -d --build
+docker-compose -f docker/docker-compose.yml up -d --build
 ```
 - Le Dashboard sera accessible sur `http://localhost:8080`
 - L'API sera accessible sur `http://localhost:8000/docs`
