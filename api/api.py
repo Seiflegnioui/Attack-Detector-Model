@@ -19,9 +19,9 @@ CLASS_LABELS = ['Normal', 'DoS', 'Probe', 'R2L', 'U2R']
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global model, scaler, model_columns, X_test_scaled_arr, raw_test_info
-    print("🚀 Chargement Ultra-Rapide (Mémoire Optimisée)...")
+    print("[API] Loading models...")
     
-    model = joblib.load('models/best_model_cv.pkl')
+    model = joblib.load('models/best_model.pkl')
     scaler = joblib.load('models/scaler.pkl')
     model_columns = joblib.load('models/model_columns.pkl')
     
@@ -59,9 +59,9 @@ async def lifespan(app: FastAPI):
     X_test = pd.get_dummies(test_df, columns=['protocol_type', 'service', 'flag'])
     X_test = X_test.reindex(columns=model_columns, fill_value=0)
     X_test_scaled_arr = scaler.transform(X_test)
-    print("✅ API Prête à traiter le trafic !")
+    print("[API] Ready to process traffic!")
     yield
-    print("🛑 Arrêt de l'API...")
+    print("[API] Stopping API...")
 
 app = FastAPI(
     title="IDS Real-Time API",

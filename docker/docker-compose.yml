@@ -1,5 +1,6 @@
 services:
-  # L'API Python FastAPI
+
+  # FastAPI backend — loads the trained model and serves predictions
   api:
     build:
       context: ../
@@ -14,18 +15,17 @@ services:
       timeout: 10s
       retries: 3
 
-  # Le serveur Web Nginx pour le Dashboard HTML
+  # Nginx — serves the dashboard HTML and report charts as static files
   dashboard:
     image: nginx:alpine
     ports:
       - "8080:80"
     volumes:
-      # Montage des fichiers statiques dans le conteneur
       - ../frontend/index.html:/usr/share/nginx/html/index.html:ro
-      - ../reports/confusion_matrices_optimized.png:/usr/share/nginx/html/confusion_matrices_optimized.png:ro
-      - ../reports/feature_importance_optimized.png:/usr/share/nginx/html/feature_importance_optimized.png:ro
-      - ../reports/model_comparison_optimized.png:/usr/share/nginx/html/model_comparison_optimized.png:ro
-      - ../reports/roc_curves_optimized.png:/usr/share/nginx/html/roc_curves_optimized.png:ro
+      - ../reports/confusion_matrices.png:/usr/share/nginx/html/confusion_matrices.png:ro
+      - ../reports/feature_importance.png:/usr/share/nginx/html/feature_importance.png:ro
+      - ../reports/model_comparison.png:/usr/share/nginx/html/model_comparison.png:ro
+      - ../reports/roc_curves.png:/usr/share/nginx/html/roc_curves.png:ro
     depends_on:
       - api
     restart: unless-stopped

@@ -1,30 +1,29 @@
-# Dossiers virtuels et Git
+# Virtual environments and git
 venv/
 .env/
 __pycache__/
 .git/
 .gitignore
 
-# Les notebooks de recherche (inutiles en production)
+# Jupyter notebooks (not needed in production)
 *.ipynb
 
-# Les modèles intermédiaires (on ne garde que les bons)
+# All .pkl files except the three the API needs
 *.pkl
-!best_model_cv.pkl
-!scaler.pkl
-!model_columns.pkl
+!models/best_model.pkl
+!models/scaler.pkl
+!models/model_columns.pkl
 
-
-# Les graphiques (servis par le Nginx directement depuis le dossier hôte)
+# Charts are served by Nginx directly from the host volume
 *.png
 
-# Les scripts d'entraînement
-run_models.py
-run_advanced_models.py
+# Training and data-prep scripts (not needed inside the API container)
+src/
 
-# Les autres fichiers de test non nécessaires au pipeline
-KDDTest-21*
-KDDTrain+_20Percent*
+# Raw training data and extra test splits
+data/KDDTrain+*
+data/KDDTest-21*
+data/processed/
 
-# Fichiers UI front-end (gérés par le conteneur Nginx)
-index.html
+# Frontend (served by the Nginx container)
+frontend/

@@ -1,5 +1,6 @@
 # Virtual environment
 venv/
+.env/
 
 # Python cache
 __pycache__/
@@ -9,8 +10,11 @@ __pycache__/
 # Jupyter checkpoints
 .ipynb_checkpoints/
 
-# Saved models (too large for git — regenerate with run_models.py)
+# Saved models — regenerate with: python src/prepare_data.py && python src/train_model.py
 *.pkl
+
+# Processed data splits — regenerate with: python src/prepare_data.py
+data/processed/
 
 # OS files
 .DS_Store
