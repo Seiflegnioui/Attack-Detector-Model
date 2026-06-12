@@ -10,11 +10,14 @@ __pycache__/
 # Jupyter checkpoints
 .ipynb_checkpoints/
 
-# Saved models — regenerate with: python src/prepare_data.py && python src/train_model.py
+# Saved models — regenerate with notebooks
 *.pkl
 
-# Processed data splits — regenerate with: python src/prepare_data.py
+# Processed data splits — regenerate with notebooks
 data/processed/
+
+# Ignore generated report charts but keep the directory
+reports/*.png
 
 # OS files
 .DS_Store
