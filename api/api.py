@@ -48,7 +48,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost:8080", "http://127.0.0.1:8080"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -100,7 +100,7 @@ class NetworkConnection(BaseModel):
 def predict_live(conn: NetworkConnection):
     """Accepts JSON with 41 features and returns the predicted attack class."""
     start = time.perf_counter()
-    df = pd.DataFrame([conn.dict()])
+    df = pd.DataFrame([conn.model_dump() if hasattr(conn, 'model_dump') else conn.dict()])
     df_dummies = pd.get_dummies(df, columns=['protocol_type', 'service', 'flag'])
     df_aligned = df_dummies.reindex(columns=model_columns, fill_value=0)
     df_scaled = scaler.transform(df_aligned)
