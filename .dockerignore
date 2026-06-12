@@ -1,0 +1,22 @@
+# Dockerignore
+.git
+.gitignore
+
+# Data & Notebooks (Not needed in production API)
+data/
+notebooks/
+docs/
+reports/
+audit_repo_attack_detector.html
+
+# Cache & environments
+__pycache__/
+*.pyc
+.env
+venv/
+env/
+
+# Other unnecessary files
+*.arff
+*.ipynb
+*.pdf

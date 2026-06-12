@@ -65,7 +65,7 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(
     title="IDS Real-Time API",
-    description="Backend de détection d'intrusions réseau avec endpoints REST standards.",
+    description="Network intrusion detection backend with standard REST endpoints.",
     version="2.0.0",
     lifespan=lifespan
 )
@@ -120,9 +120,9 @@ class NetworkConnection(BaseModel):
     dst_host_rerror_rate: float = 0.0
     dst_host_srv_rerror_rate: float = 0.0
 
-@app.post("/predict", summary="Inférence Temps Réel sur une connexion personnalisée")
+@app.post("/predict", summary="Real-time inference on a custom connection")
 def predict_live(conn: NetworkConnection):
-    """Accepte un JSON avec 41 features et retourne la classe d'attaque prédite."""
+    """Accepts JSON with 41 features and returns the predicted attack class."""
     start = time.perf_counter()
     df = pd.DataFrame([conn.dict()])
     df_dummies = pd.get_dummies(df, columns=['protocol_type', 'service', 'flag'])
@@ -139,7 +139,7 @@ def predict_live(conn: NetworkConnection):
         "latency_ms": round((end - start) * 1000, 3)
     }
 
-@app.get("/predict/random", summary="Simuler un flux depuis le Test Set (Dashboard)")
+@app.get("/predict/random", summary="Simulate a stream from the Test Set (Dashboard)")
 def predict_random():
     idx = random.randint(0, len(X_test_scaled_arr) - 1)
     row_features = X_test_scaled_arr[[idx]]
@@ -157,13 +157,13 @@ def predict_random():
         "true_label": true_label,
         "prediction": pred_label,
         "confidence": round(float(np.max(probas)) * 100, 2),
-        "status": "Correct" if pred_label == true_label else "Erreur",
+        "status": "Correct" if pred_label == true_label else "Error",
         "latency_ms": round((end - start) * 1000, 3)
     }
 
-@app.get("/", summary="Check santé de l'API")
+@app.get("/", summary="API Health Check")
 def root():
-    return {"status": "online", "model": "XGBoost + SMOTE", "message": "Allez sur /docs"}
+    return {"status": "online", "model": "XGBoost + SMOTE", "message": "Go to /docs"}
 
 if __name__ == "__main__":
     import uvicorn
