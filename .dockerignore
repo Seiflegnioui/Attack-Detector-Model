@@ -2,8 +2,9 @@
 .git
 .gitignore
 
-# Data & Notebooks (Not needed in production API)
-data/
+# Ignore raw huge text files but keep processed pkls
+data/*.txt
+data/processed/*.txt
 notebooks/
 docs/
 reports/
